@@ -124,6 +124,13 @@
             <p class="auth-subtitle">Remote Print Accounting &amp; Workstation Portal</p>
         </div>
 
+        @if (request('email'))
+            <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 1.5rem; font-size: 0.85rem; color: #6EE7B7; line-height: 1.45;">
+                🎉 <strong>Workstation Linked Successfully!</strong><br>
+                Your account for <strong>{{ request('email') }}</strong> is ready. Log in with your default password <code>admin</code> to finish setting up your account.
+            </div>
+        @endif
+
         @if ($errors->any())
             <div class="alert alert-danger" style="margin-bottom: 1.25rem;">
                 <div>
@@ -139,7 +146,7 @@
 
             <div class="form-group">
                 <label class="form-label" for="email">User Email Address</label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="user@company.com" value="{{ old('email') }}" required autofocus>
+                <input type="email" id="email" name="email" class="form-control" placeholder="user@company.com" value="{{ old('email', request('email')) }}" required autofocus>
             </div>
 
             <div class="form-group">

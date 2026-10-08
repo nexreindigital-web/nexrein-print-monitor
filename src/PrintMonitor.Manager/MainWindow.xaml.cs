@@ -144,6 +144,8 @@ public partial class MainWindow : Window
 
     private bool RequireSuperAdmin(string actionDescription)
     {
+        // Dynamically reload in case the password was updated remotely from the Laravel Cloud Web Portal
+        _settingsManager.Reload();
         var storedHash = _settingsManager.Settings.AdminPasswordHash;
         var dialog = new PasswordPromptDialog(actionDescription, storedHash)
         {

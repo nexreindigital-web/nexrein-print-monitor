@@ -113,6 +113,14 @@ public class SettingsManager
         }
     }
 
+    public void Reload()
+    {
+        lock (SyncLock)
+        {
+            LoadOverrideConfig();
+        }
+    }
+
     public void SaveSettings(Action<AgentSettings> updateAction)
     {
         lock (SyncLock)

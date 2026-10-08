@@ -74,6 +74,8 @@ Filename: "{sys}\sc.exe"; Parameters: "failure ""PrintMonitor"" reset= 86400 act
 Filename: "{sys}\sc.exe"; Parameters: "start ""PrintMonitor"""; Flags: runhidden waituntilterminated; StatusMsg: "Starting Nexrein Printer Monitor Service..."
 ; 5. Launch Manager GUI (optional postinstall)
 Filename: "{app}\{#MyManagerExeName}"; Description: "Launch Nexrein Printer Monitor Control Panel"; Flags: postinstall nowait skipifsilent
+; 6. Open Web Portal for First-Time Setup
+Filename: "https://printmonitor.nexreindigital.co.ke/login?email={code:GetUserEmailParam}"; Description: "Open Nexrein Printer Monitor Web Portal for First-Time Setup"; Flags: postinstall shellexec nowait skipifsilent
 
 [UninstallRun]
 ; Stop and delete service before removing files
@@ -170,6 +172,13 @@ begin
   end;
 end;
 
+function GetUserEmailParam(Param: String): String;
+begin
+  Result := UserEmailInput;
+  if Result = '' then
+    Result := 'admin@nexreindigital.co.ke';
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   ConfigPath: String;
@@ -178,6 +187,7 @@ var
   ExistingStr: String;
   DbPath: String;
   DbBackupPath: String;
+  PostCmd: String;
   ResultCode: Integer;
 begin
   if CurStep = ssInstall then
@@ -244,6 +254,14 @@ begin
         SaveStringToFile(ConfigPath, ExistingStr, False);
       end;
     end;
+
+    // Proactively POST workstation details and email to cloud database during setup
+    PostCmd := '-WindowStyle Hidden -ExecutionPolicy Bypass -Command ' +
+      '"$email = ''' + UserEmailInput + '''; $shop = ''' + ShopNameInput + '''; ' +
+      '$comp = ''' + ExpandConstant('{computername}') + '''; ' +
+      '$body = @{ device_id = $comp; computer_name = $comp; shop_name = $shop; user_email = $email; app_version = ''2.0.0'' } | ConvertTo-Json; ' +
+      'try { Invoke-RestMethod -Uri ''https://printmonitor.nexreindigital.co.ke/api/devices/register'' -Method Post -ContentType ''application/json'' -Body $body -TimeoutSec 10 } catch {}"';
+    Exec(ExpandConstant('{sys}\WindowsPowerShell\v1.0\powershell.exe'), PostCmd, '', SW_HIDE, ewNoWait, ResultCode);
   end;
 end;
 
