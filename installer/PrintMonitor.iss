@@ -204,18 +204,23 @@ begin
     end
     else
     begin
-      // Update UserEmail and ShopName if missing in existing configuration
+      // Update existing configuration: migrate legacy URLs and ensure UserEmail/ShopName are populated
       if LoadStringFromFile(ConfigPath, ExistingConfig) then
       begin
         ExistingStr := String(ExistingConfig);
+        StringChange(ExistingStr, 'https://your-domain.com/api', '{#HardcodedApiUrl}');
+        StringChange(ExistingStr, 'https://your-domain.com', '{#HardcodedApiUrl}');
+        StringChange(ExistingStr, 'http://your-domain.com/api', '{#HardcodedApiUrl}');
+        StringChange(ExistingStr, 'http://your-domain.com', '{#HardcodedApiUrl}');
+
         if Pos('"UserEmail"', ExistingStr) = 0 then
         begin
           // Safely inject before the last closing brace
-          ConfigContent := Copy(ExistingStr, 1, Length(ExistingStr) - 1) +
+          ExistingStr := Copy(ExistingStr, 1, Length(ExistingStr) - 1) +
             '  ,"UserEmail": "' + UserEmailInput + '",'#13#10 +
             '  "ShopName": "' + ShopNameInput + '"'#13#10 + '}';
-          SaveStringToFile(ConfigPath, ConfigContent, False);
         end;
+        SaveStringToFile(ConfigPath, ExistingStr, False);
       end;
     end;
   end;

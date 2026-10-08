@@ -33,7 +33,22 @@ public class SettingsManager
         // 2. Override with local persistent config if exists
         LoadOverrideConfig();
 
-        // 3. Ensure DeviceId is established
+        // 3. Ensure hardcoded production endpoint and self-heal any legacy config
+        const string productionEndpoint = "https://printmonitor.nexreindigital.co.ke/api";
+        if (string.IsNullOrWhiteSpace(_settings.ApiBaseUrl) || _settings.ApiBaseUrl.Contains("your-domain.com", StringComparison.OrdinalIgnoreCase))
+        {
+            _settings.ApiBaseUrl = productionEndpoint;
+            try
+            {
+                SaveSettings(s => s.ApiBaseUrl = productionEndpoint);
+            }
+            catch
+            {
+                // Ignore initial save error if directory permissions are pending
+            }
+        }
+
+        // 4. Ensure DeviceId is established
         if (string.IsNullOrWhiteSpace(_settings.DeviceId))
         {
             var dataDir = Path.GetDirectoryName(_settings.DatabasePath) ?? defaultDataDir;
@@ -51,8 +66,15 @@ public class SettingsManager
                 var overrideSettings = JsonSerializer.Deserialize<AgentSettings>(json);
                 if (overrideSettings != null)
                 {
-                    if (!string.IsNullOrWhiteSpace(overrideSettings.ApiBaseUrl))
+                    if (!string.IsNullOrWhiteSpace(overrideSettings.ApiBaseUrl) &&
+                        !overrideSettings.ApiBaseUrl.Contains("your-domain.com", StringComparison.OrdinalIgnoreCase))
+                    {
                         _settings.ApiBaseUrl = overrideSettings.ApiBaseUrl;
+                    }
+                    else
+                    {
+                        _settings.ApiBaseUrl = "https://printmonitor.nexreindigital.co.ke/api";
+                    }
 
                     if (!string.IsNullOrWhiteSpace(overrideSettings.ApiKey))
                         _settings.ApiKey = overrideSettings.ApiKey;
