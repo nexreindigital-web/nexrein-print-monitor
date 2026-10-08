@@ -78,32 +78,13 @@ Filename: "{app}\{#MyManagerExeName}"; Description: "Launch Nexrein Print Monito
 Filename: "{sys}\sc.exe"; Parameters: "stop ""PrintMonitor"""; Flags: runhidden waituntilterminated; RunOnceId: "StopPrintMonitorService"
 Filename: "{sys}\sc.exe"; Parameters: "delete ""PrintMonitor"""; Flags: runhidden waituntilterminated; RunOnceId: "DeletePrintMonitorService"
 
+#define HardcodedApiUrl "https://your-domain.com/api"
+
 [Code]
-var
-  ApiPage: TInputQueryWizardPage;
-
-procedure InitializeWizard;
-begin
-  ApiPage := CreateInputQueryPage(
-    wpSelectDir,
-    'Nexrein Print Monitor API Configuration',
-    'Enter the remote Laravel management server connection details.',
-    'Please enter the API base URL and your authentication key or token. These can also be configured later in C:\ProgramData\PrintMonitor\config.json.');
-
-  ApiPage.Add('API Base URL (e.g., https://your-domain.com/api):', False);
-  ApiPage.Add('API Key / Device Token (optional):', False);
-
-  // Default values
-  ApiPage.Values[0] := 'https://your-domain.com/api';
-  ApiPage.Values[1] := '';
-end;
-
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   ConfigPath: String;
   ConfigContent: String;
-  ApiUrlVal: String;
-  ApiKeyVal: String;
   ResultCode: Integer;
 begin
   if CurStep = ssInstall then
@@ -117,23 +98,14 @@ begin
 
   if CurStep = ssPostInstall then
   begin
-    ApiUrlVal := 'https://your-domain.com/api';
-    ApiKeyVal := '';
-    if ApiPage <> nil then
-    begin
-      if Length(ApiPage.Values[0]) > 0 then
-        ApiUrlVal := ApiPage.Values[0];
-      ApiKeyVal := ApiPage.Values[1];
-    end;
-
     ConfigPath := ExpandConstant('{commonappdata}\PrintMonitor\config.json');
 
-    // Create JSON configuration file if it does not exist
+    // Create JSON configuration file with hardcoded default URL if it does not exist
     if not FileExists(ConfigPath) then
     begin
       ConfigContent := '{'#13#10 +
-        '  "ApiBaseUrl": "' + ApiUrlVal + '",'#13#10 +
-        '  "ApiKey": "' + ApiKeyVal + '",'#13#10 +
+        '  "ApiBaseUrl": "{#HardcodedApiUrl}",'#13#10 +
+        '  "ApiKey": "",'#13#10 +
         '  "SyncIntervalSeconds": 30,'#13#10 +
         '  "HeartbeatIntervalSeconds": 60,'#13#10 +
         '  "PollingIntervalSeconds": 5,'#13#10 +

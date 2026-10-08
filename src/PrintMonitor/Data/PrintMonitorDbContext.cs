@@ -346,7 +346,13 @@ public class PrintMonitorDbContext
         return (0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
-    public List<PrintJob> GetFilteredJobs(int limit = 100, string? search = null, string? printer = null, string? syncStatus = null)
+    public List<PrintJob> GetFilteredJobs(
+        int limit = 100, 
+        string? search = null, 
+        string? printer = null, 
+        string? syncStatus = null,
+        DateTime? fromDate = null,
+        DateTime? toDate = null)
     {
         var list = new List<PrintJob>();
         using var conn = CreateConnection();
@@ -385,6 +391,18 @@ public class PrintMonitorDbContext
             }
         }
 
+        if (fromDate.HasValue)
+        {
+            sql += " AND submitted_at >= @fromDate";
+            cmd.Parameters.AddWithValue("@fromDate", fromDate.Value.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture));
+        }
+
+        if (toDate.HasValue)
+        {
+            sql += " AND submitted_at <= @toDate";
+            cmd.Parameters.AddWithValue("@toDate", toDate.Value.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture));
+        }
+
         sql += " ORDER BY id DESC LIMIT @limit;";
         cmd.Parameters.AddWithValue("@limit", limit);
         cmd.CommandText = sql;
@@ -396,6 +414,47 @@ public class PrintMonitorDbContext
         }
 
         return list;
+    }
+
+    public (int jobsCount, int pagesCount, int colorPages, int monoPages) GetDateFilteredStats(DateTime? fromDate, DateTime? toDate)
+    {
+        using var conn = CreateConnection();
+        using var cmd = conn.CreateCommand();
+        var sql = @"
+            SELECT 
+                COUNT(*),
+                COALESCE(SUM(CASE WHEN pages_printed > 0 THEN pages_printed ELSE pages * copies END), 0),
+                COALESCE(SUM(CASE WHEN color_mode = 'Color' THEN (CASE WHEN pages_printed > 0 THEN pages_printed ELSE pages * copies END) ELSE 0 END), 0),
+                COALESCE(SUM(CASE WHEN color_mode != 'Color' THEN (CASE WHEN pages_printed > 0 THEN pages_printed ELSE pages * copies END) ELSE 0 END), 0)
+            FROM print_jobs
+            WHERE 1=1
+        ";
+
+        if (fromDate.HasValue)
+        {
+            sql += " AND submitted_at >= @fromDate";
+            cmd.Parameters.AddWithValue("@fromDate", fromDate.Value.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture));
+        }
+
+        if (toDate.HasValue)
+        {
+            sql += " AND submitted_at <= @toDate";
+            cmd.Parameters.AddWithValue("@toDate", toDate.Value.ToUniversalTime().ToString("o", CultureInfo.InvariantCulture));
+        }
+
+        cmd.CommandText = sql;
+        using var reader = cmd.ExecuteReader();
+        if (reader.Read())
+        {
+            return (
+                reader.GetInt32(0),
+                Convert.ToInt32(reader.GetInt64(1)),
+                Convert.ToInt32(reader.GetInt64(2)),
+                Convert.ToInt32(reader.GetInt64(3))
+            );
+        }
+
+        return (0, 0, 0, 0);
     }
 
     private static PrintJob ReadJob(SqliteDataReader reader)

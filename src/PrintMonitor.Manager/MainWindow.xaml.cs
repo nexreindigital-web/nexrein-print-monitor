@@ -67,12 +67,17 @@ public partial class MainWindow : Window
     {
         UpdateServiceStatusOnly();
         UpdateMetricsOnly();
+        if (_isLoaded && !_isUpdatingUi && MainTabs?.SelectedIndex == 0)
+        {
+            LoadDashboardPrints();
+        }
     }
 
     private void LoadAllData()
     {
         UpdateServiceStatusOnly();
         LoadMetrics();
+        LoadDashboardPrints();
         LoadMachineAndStorageInfo();
         LoadPrinters();
         LoadJobs();
@@ -421,6 +426,167 @@ public partial class MainWindow : Window
 
     #endregion
 
+    #region Dashboard Print Activity & Date Filtering
+
+    private (DateTime? fromDate, DateTime? toDate, string label) GetDashboardDateRange()
+    {
+        var idx = CmbDashDateFilter?.SelectedIndex ?? 0;
+        var today = DateTime.Today;
+
+        switch (idx)
+        {
+            case 0: // Today
+                return (today, today.AddDays(1).AddTicks(-1), "Today");
+
+            case 1: // Yesterday
+                var yesterday = today.AddDays(-1);
+                return (yesterday, today.AddTicks(-1), "Yesterday");
+
+            case 2: // Last 7 Days
+                return (today.AddDays(-6), DateTime.Now, "Last 7 Days");
+
+            case 3: // This Month
+                var startOfMonth = new DateTime(today.Year, today.Month, 1);
+                return (startOfMonth, DateTime.Now, "This Month");
+
+            case 4: // All Time
+                return (null, null, "All Time");
+
+            case 5: // Custom Range
+                var from = DpStartDate?.SelectedDate?.Date;
+                var to = DpEndDate?.SelectedDate?.Date.AddDays(1).AddTicks(-1);
+                var lbl = from.HasValue && to.HasValue 
+                    ? $"{from.Value:yyyy-MM-dd} to {to.Value:yyyy-MM-dd}" 
+                    : (from.HasValue ? $"From {from.Value:yyyy-MM-dd}" : "Custom Range");
+                return (from, to, lbl);
+
+            default:
+                return (today, today.AddDays(1).AddTicks(-1), "Today");
+        }
+    }
+
+    private void LoadDashboardPrints()
+    {
+        if (!_isLoaded || _isUpdatingUi || _dbContext == null || DgDashboardJobs == null)
+            return;
+
+        try
+        {
+            var (fromDate, toDate, label) = GetDashboardDateRange();
+
+            var jobs = _dbContext.GetFilteredJobs(50, null, null, null, fromDate, toDate);
+            var stats = _dbContext.GetDateFilteredStats(fromDate, toDate);
+
+            var items = jobs.Select(j =>
+            {
+                var docType = DocumentTypeClassifier.Classify(j.DocumentName);
+                var isColor = string.Equals(j.ColorMode, "Color", StringComparison.OrdinalIgnoreCase);
+
+                return new PrintJobDisplayItem
+                {
+                    JobUid = j.JobUid,
+                    JobId = j.JobId,
+                    DocumentName = j.DocumentName,
+                    DocumentTypeIcon = docType.Icon,
+                    DocumentTypeName = docType.TypeName,
+                    Username = j.Username,
+                    ComputerName = j.ComputerName,
+                    PrinterName = j.PrinterName,
+                    Pages = j.Pages,
+                    Copies = j.Copies,
+                    TotalPagesCalculated = (j.PagesPrinted > 0 ? j.PagesPrinted : (j.Pages * j.Copies)),
+                    ColorMode = j.ColorMode,
+                    ColorModeDisplay = isColor ? "🎨 Color" : "🔲 B&W / Gray",
+                    ColorBadgeBg = isColor ? new SolidColorBrush(Color.FromRgb(88, 28, 135)) : new SolidColorBrush(Color.FromRgb(30, 41, 59)),
+                    ColorBadgeFg = isColor ? new SolidColorBrush(Color.FromRgb(233, 213, 255)) : new SolidColorBrush(Color.FromRgb(148, 163, 184)),
+                    Duplex = j.Duplex,
+                    PaperSize = j.PaperSize,
+                    Status = j.Status,
+                    SyncStatus = j.SyncStatus,
+                    SubmittedAtLocal = j.SubmittedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")
+                };
+            }).ToList();
+
+            DgDashboardJobs.ItemsSource = items;
+
+            if (TxtDashKpiPeriod != null) TxtDashKpiPeriod.Text = label;
+            if (TxtDashKpiPages != null) TxtDashKpiPages.Text = $"{stats.pagesCount:N0} Pages";
+            if (TxtDashKpiBreakdown != null) TxtDashKpiBreakdown.Text = $"{stats.colorPages:N0} Color • {stats.monoPages:N0} B&W";
+            if (TxtDashKpiJobs != null) TxtDashKpiJobs.Text = $"{stats.jobsCount:N0} Jobs";
+            if (TxtDashDateBadge != null) TxtDashDateBadge.Text = $"{label} ({stats.jobsCount:N0} prints)";
+            if (TxtDashTableFooter != null) TxtDashTableFooter.Text = $"Showing {items.Count} print job(s) for {label} | Total: {stats.pagesCount:N0} pages";
+        }
+        catch (Exception ex)
+        {
+            if (TxtStatusBar != null)
+                TxtStatusBar.Text = $"Dashboard prints notice: {ex.Message}";
+        }
+    }
+
+    private void CmbDashDateFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_isLoaded || _isUpdatingUi) return;
+
+        if (PnlCustomDateRange != null)
+        {
+            PnlCustomDateRange.Visibility = CmbDashDateFilter.SelectedIndex == 5 ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        LoadDashboardPrints();
+    }
+
+    private void DpDate_SelectedDateChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (!_isLoaded || _isUpdatingUi) return;
+        LoadDashboardPrints();
+    }
+
+    private void BtnRefreshDash_Click(object sender, RoutedEventArgs e)
+    {
+        LoadMetrics();
+        LoadDashboardPrints();
+        if (TxtStatusBar != null)
+            TxtStatusBar.Text = $"Dashboard refreshed at {DateTime.Now:HH:mm:ss}";
+    }
+
+    private void BtnExportDashCsv_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var (fromDate, toDate, label) = GetDashboardDateRange();
+            var jobs = _dbContext.GetFilteredJobs(500, null, null, null, fromDate, toDate);
+
+            var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            var safeLabel = label.Replace(" ", "_").Replace(":", "-");
+            var exportFile = Path.Combine(desktop, $"PrintMonitor_{safeLabel}_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+
+            using var sw = new StreamWriter(exportFile);
+            sw.WriteLine("JobUid,JobId,SubmittedAtLocal,DocumentName,DocumentType,Username,Computer,Printer,Pages,Copies,TotalPages,ColorMode,Duplex,PaperSize,Status,SyncStatus");
+            foreach (var j in jobs)
+            {
+                var dt = DocumentTypeClassifier.Classify(j.DocumentName);
+                var total = j.PagesPrinted > 0 ? j.PagesPrinted : (j.Pages * j.Copies);
+                sw.WriteLine($"\"{j.JobUid}\",{j.JobId},\"{j.SubmittedAt.ToLocalTime():yyyy-MM-dd HH:mm:ss}\",\"{j.DocumentName}\",\"{dt.TypeName}\",\"{j.Username}\",\"{j.ComputerName}\",\"{j.PrinterName}\",{j.Pages},{j.Copies},{total},\"{j.ColorMode}\",\"{j.Duplex}\",\"{j.PaperSize}\",\"{j.Status}\",\"{j.SyncStatus}\"");
+            }
+
+            MessageBox.Show($"Exported {jobs.Count} jobs for {label} to:\n{exportFile}", "Export Completed", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Export failed: {ex.Message}", "Export", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void BtnGoToHistoryTab_Click(object sender, RoutedEventArgs e)
+    {
+        if (MainTabs != null)
+        {
+            MainTabs.SelectedIndex = 1;
+        }
+    }
+
+    #endregion
+
     #region Print Jobs Tab & Document Type Detection
 
     private void LoadJobs()
@@ -544,6 +710,7 @@ public partial class MainWindow : Window
             _dbContext.SaveOrUpdateJob(job);
             LoadJobs();
             LoadMetrics();
+            LoadDashboardPrints();
 
             var docType = DocumentTypeClassifier.Classify(job.DocumentName);
             MessageBox.Show($"Test Print Job Recorded!\n\nDocument: {job.DocumentName}\nDetected Type: {docType.Icon} {docType.TypeName}\nColor Mode: {(isColor ? "Color" : "Black and White / Grayscale")}\nPages: {job.Pages} (Copies: {job.Copies})\nTotal: {job.Pages * job.Copies} page(s)", "Print Job Accounting", MessageBoxButton.OK, MessageBoxImage.Information);
