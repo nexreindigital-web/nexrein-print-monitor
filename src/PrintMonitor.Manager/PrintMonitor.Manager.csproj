@@ -7,9 +7,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Resources\app.ico</ApplicationIcon>
-    <Product>Nexrein Print Monitor</Product>
+    <Product>Nexrein Printer Monitor</Product>
     <Company>Nexrein</Company>
-    <Description>Nexrein Print Monitor Control Panel &amp; Manager</Description>
+    <Description>Nexrein Printer Monitor Control Panel &amp; Manager</Description>
+    <Version>2.0.0</Version>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

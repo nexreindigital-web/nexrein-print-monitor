@@ -288,10 +288,10 @@ public class Program
 
         try
         {
-            var createCmd = $"create \"{ServiceName}\" binPath= \"\\\"{exePath}\\\"\" start= auto DisplayName= \"Nexrein Print Monitor - Print Monitoring Agent\"";
+            var createCmd = $"create \"{ServiceName}\" binPath= \"\\\"{exePath}\\\"\" start= auto DisplayName= \"Nexrein Printer Monitor - Print Monitoring Agent\"";
             var result = RunProcess("sc.exe", createCmd);
 
-            var descCmd = $"description \"{ServiceName}\" \"Monitors Windows print jobs and synchronizes print activity with the Nexrein Print Monitor management system.\"";
+            var descCmd = $"description \"{ServiceName}\" \"Monitors Windows print jobs and synchronizes print activity with the Nexrein Printer Monitor management system.\"";
             RunProcess("sc.exe", descCmd);
 
             // Configure failure recovery: restart on first, second, subsequent
@@ -357,7 +357,7 @@ public class Program
         var managerExe = managerCandidates.FirstOrDefault(File.Exists);
         if (managerExe != null)
         {
-            Console.WriteLine($"Launching Nexrein Print Monitor Manager GUI: {managerExe}");
+            Console.WriteLine($"Launching Nexrein Printer Monitor Manager GUI: {managerExe}");
             Process.Start(new ProcessStartInfo { FileName = managerExe, UseShellExecute = true });
             return 0;
         }
@@ -368,7 +368,7 @@ public class Program
 
     private static void PrintHelp()
     {
-        Console.WriteLine(@"Nexrein Print Monitor - Windows Print Monitoring Agent
+        Console.WriteLine(@"Nexrein Printer Monitor - Windows Print Monitoring Agent
 
 Usage:
   PrintMonitor.exe [command]

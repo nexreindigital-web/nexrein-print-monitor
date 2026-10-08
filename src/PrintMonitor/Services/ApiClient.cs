@@ -13,6 +13,7 @@ public interface IApiClient
     Task<(bool success, HeartbeatResponse? response, string? error)> SendHeartbeatAsync(HeartbeatRequest request, CancellationToken ct = default);
     Task<(bool success, PrintJobSyncResponse? response, string? error)> SyncPrintJobsAsync(PrintJobSyncRequest request, CancellationToken ct = default);
     Task<(bool success, string? message)> TestConnectionAsync(CancellationToken ct = default);
+    Task<bool> AcknowledgePasswordAsync(string deviceId, CancellationToken ct = default);
 }
 
 public class ApiClient : IApiClient
@@ -172,6 +173,22 @@ public class ApiClient : IApiClient
         catch (Exception ex)
         {
             return (false, $"Connection test failed: {ex.Message}");
+        }
+    }
+
+    public async Task<bool> AcknowledgePasswordAsync(string deviceId, CancellationToken ct = default)
+    {
+        try
+        {
+            PrepareHeaders();
+            var json = JsonSerializer.Serialize(new { device_id = deviceId }, JsonOptions);
+            using var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync("devices/acknowledge-password", content, ct);
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
         }
     }
 }

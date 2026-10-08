@@ -60,6 +60,12 @@ public class SettingsManager
                     if (!string.IsNullOrWhiteSpace(overrideSettings.DeviceId))
                         _settings.DeviceId = overrideSettings.DeviceId;
 
+                    if (!string.IsNullOrWhiteSpace(overrideSettings.UserEmail))
+                        _settings.UserEmail = overrideSettings.UserEmail;
+
+                    if (!string.IsNullOrWhiteSpace(overrideSettings.ShopName))
+                        _settings.ShopName = overrideSettings.ShopName;
+
                     if (overrideSettings.SyncIntervalSeconds > 0)
                         _settings.SyncIntervalSeconds = overrideSettings.SyncIntervalSeconds;
 

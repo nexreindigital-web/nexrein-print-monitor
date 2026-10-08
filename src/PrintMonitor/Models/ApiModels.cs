@@ -30,6 +30,12 @@ public class DeviceRegisterRequest
 
     [JsonPropertyName("mac_address")]
     public string? MacAddress { get; set; }
+
+    [JsonPropertyName("user_email")]
+    public string? UserEmail { get; set; }
+
+    [JsonPropertyName("shop_name")]
+    public string? ShopName { get; set; }
 }
 
 public class DeviceRegisterResponse
@@ -45,6 +51,12 @@ public class DeviceRegisterResponse
 
     [JsonPropertyName("api_key")]
     public string? ApiKey { get; set; }
+
+    [JsonPropertyName("dashboard_url")]
+    public string? DashboardUrl { get; set; }
+
+    [JsonPropertyName("default_password_note")]
+    public string? DefaultPasswordNote { get; set; }
 }
 
 public class HeartbeatRequest
@@ -55,8 +67,14 @@ public class HeartbeatRequest
     [JsonPropertyName("computer_name")]
     public string ComputerName { get; set; } = string.Empty;
 
+    [JsonPropertyName("shop_name")]
+    public string? ShopName { get; set; }
+
+    [JsonPropertyName("user_email")]
+    public string? UserEmail { get; set; }
+
     [JsonPropertyName("application_version")]
-    public string ApplicationVersion { get; set; } = string.Empty;
+    public string ApplicationVersion { get; set; } = "2.0.0";
 
     [JsonPropertyName("status")]
     public string Status { get; set; } = "online";
@@ -76,8 +94,17 @@ public class HeartbeatResponse
     [JsonPropertyName("success")]
     public bool Success { get; set; }
 
+    [JsonPropertyName("status")]
+    public string? Status { get; set; }
+
     [JsonPropertyName("message")]
     public string? Message { get; set; }
+
+    [JsonPropertyName("command")]
+    public string? Command { get; set; }
+
+    [JsonPropertyName("new_password")]
+    public string? NewPassword { get; set; }
 }
 
 public class PrintJobSyncDto

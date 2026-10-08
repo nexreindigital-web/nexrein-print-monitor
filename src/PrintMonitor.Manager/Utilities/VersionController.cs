@@ -11,19 +11,20 @@ namespace PrintMonitor.Manager.Utilities;
 public class VersionCheckResult
 {
     public bool Success { get; set; }
-    public string CurrentVersion { get; set; } = "1.0.0";
-    public string LatestVersion { get; set; } = "1.0.0";
+    public string CurrentVersion { get; set; } = "2.0.0";
+    public string LatestVersion { get; set; } = "2.0.0";
     public bool UpdateAvailable { get; set; }
     public bool IsMandatory { get; set; }
     public string? DownloadUrl { get; set; }
+    public string? ReleaseNotes { get; set; }
     public string Message { get; set; } = string.Empty;
 }
 
 public static class VersionController
 {
-    public static readonly Version CurrentVersion = new(1, 0, 0);
-    public static readonly string CurrentVersionString = "1.0.0";
-    public static readonly string ProductName = "Nexrein Print Monitor";
+    public static readonly Version CurrentVersion = new(2, 0, 0);
+    public static readonly string CurrentVersionString = "2.0.0";
+    public static readonly string ProductName = "Nexrein Printer Monitor";
 
     public static string GetInstalledVersionString()
     {
@@ -36,42 +37,81 @@ public static class VersionController
     {
         var result = new VersionCheckResult
         {
-            CurrentVersion = CurrentVersionString,
-            LatestVersion = CurrentVersionString
+            CurrentVersion = GetInstalledVersionString(),
+            LatestVersion = GetInstalledVersionString()
         };
 
-        if (string.IsNullOrWhiteSpace(apiBaseUrl))
+        using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(7) };
+        client.DefaultRequestHeaders.Add("User-Agent", "NexreinPrinterMonitor/2.0.0");
+
+        // 1. Try checking configured web server / API endpoint if valid
+        if (!string.IsNullOrWhiteSpace(apiBaseUrl) &&
+            Uri.TryCreate(apiBaseUrl, UriKind.Absolute, out var uri) &&
+            !apiBaseUrl.Contains("your-domain.com"))
         {
-            result.Success = true;
-            result.Message = "No API URL configured. Running current version v" + CurrentVersionString;
-            return result;
-        }
-
-        try
-        {
-            var cleanUrl = apiBaseUrl.TrimEnd('/');
-            using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(6) };
-            if (!string.IsNullOrWhiteSpace(apiKey))
+            try
             {
-                client.DefaultRequestHeaders.Add("X-API-Key", apiKey);
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
-            }
-
-            var response = await client.GetAsync($"{cleanUrl}/version/latest");
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                using var doc = JsonDocument.Parse(content);
-                var root = doc.RootElement;
-
-                if (root.TryGetProperty("latest_version", out var verProp))
+                var cleanUrl = apiBaseUrl.TrimEnd('/');
+                if (!string.IsNullOrWhiteSpace(apiKey))
                 {
-                    result.LatestVersion = verProp.GetString() ?? CurrentVersionString;
+                    client.DefaultRequestHeaders.Add("X-API-Key", apiKey);
+                    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
                 }
 
-                if (root.TryGetProperty("installer", out var instProp) && instProp.TryGetProperty("download_url", out var dlProp))
+                var response = await client.GetAsync($"{cleanUrl}/version/latest");
+                if (response.IsSuccessStatusCode)
                 {
-                    result.DownloadUrl = dlProp.GetString();
+                    var content = await response.Content.ReadAsStringAsync();
+                    using var doc = JsonDocument.Parse(content);
+                    var root = doc.RootElement;
+
+                    if (root.TryGetProperty("latest_version", out var verProp))
+                    {
+                        result.LatestVersion = verProp.GetString() ?? result.CurrentVersion;
+                    }
+
+                    if (root.TryGetProperty("installer", out var instProp) && instProp.TryGetProperty("download_url", out var dlProp))
+                    {
+                        result.DownloadUrl = dlProp.GetString();
+                    }
+
+                    if (root.TryGetProperty("release_notes", out var notesProp))
+                    {
+                        result.ReleaseNotes = notesProp.GetString();
+                    }
+
+                    if (Version.TryParse(result.LatestVersion, out var remoteVer))
+                    {
+                        result.UpdateAvailable = remoteVer > CurrentVersion;
+                    }
+
+                    result.Success = true;
+                    result.Message = result.UpdateAvailable
+                        ? $"New version v{result.LatestVersion} is available! Click to update."
+                        : $"{ProductName} is up to date (v{result.CurrentVersion}).";
+                    return result;
+                }
+            }
+            catch
+            {
+                // Fallback to secondary update check
+            }
+        }
+
+        // 2. Check GitHub Releases / Version endpoint fallback
+        try
+        {
+            var ghUrl = "https://raw.githubusercontent.com/nexreindigital-web/nexrein-print-monitor/main/version.json";
+            var ghResp = await client.GetAsync(ghUrl);
+            if (ghResp.IsSuccessStatusCode)
+            {
+                var jsonStr = await ghResp.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(jsonStr);
+                var root = doc.RootElement;
+
+                if (root.TryGetProperty("version", out var vProp))
+                {
+                    result.LatestVersion = vProp.GetString() ?? result.CurrentVersion;
                 }
 
                 if (Version.TryParse(result.LatestVersion, out var remoteVer))
@@ -79,23 +119,24 @@ public static class VersionController
                     result.UpdateAvailable = remoteVer > CurrentVersion;
                 }
 
+                result.DownloadUrl = "https://github.com/nexreindigital-web/nexrein-print-monitor/releases/latest";
                 result.Success = true;
                 result.Message = result.UpdateAvailable
-                    ? $"New release v{result.LatestVersion} available."
-                    : $"Nexrein Print Monitor is up to date (v{CurrentVersionString}).";
-            }
-            else
-            {
-                result.Success = false;
-                result.Message = $"Version check server responded with HTTP {(int)response.StatusCode}";
+                    ? $"New release v{result.LatestVersion} is available for download."
+                    : $"{ProductName} is up to date (v{result.CurrentVersion}).";
+                return result;
             }
         }
-        catch (Exception ex)
+        catch
         {
-            result.Success = false;
-            result.Message = $"Version check skipped: {ex.Message}";
+            // Network or GitHub unreachable
         }
 
+        // 3. Fallback when offline or not configured
+        result.Success = true;
+        result.LatestVersion = result.CurrentVersion;
+        result.UpdateAvailable = false;
+        result.Message = $"{ProductName} is running current version v{result.CurrentVersion}.";
         return result;
     }
 
@@ -106,6 +147,7 @@ public static class VersionController
             Path.Combine(AppContext.BaseDirectory, "PrintMonitor-Setup.exe"),
             Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "release", "PrintMonitor-Setup.exe"),
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Desktop", "PrintMonitor", "release", "PrintMonitor-Setup.exe"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "OneDrive", "Desktop", "PrintMonitor", "release", "PrintMonitor-Setup.exe"),
             @"C:\Program Files\PrintMonitor\installer\PrintMonitor-Setup.exe"
         };
 
@@ -121,5 +163,18 @@ public static class VersionController
 
         installerPath = string.Empty;
         return false;
+    }
+
+    public static void OpenUrl(string url)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true
+            });
+        }
+        catch { }
     }
 }

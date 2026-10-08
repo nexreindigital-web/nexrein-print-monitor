@@ -99,18 +99,37 @@ public class HealthCheckService : IHealthCheckService
             {
                 DeviceId = deviceId,
                 ComputerName = Environment.MachineName,
-                ApplicationVersion = "1.0.0",
+                ShopName = _settingsManager.Settings.ShopName,
+                UserEmail = _settingsManager.Settings.UserEmail,
+                ApplicationVersion = "2.0.0",
                 Status = "online",
                 LastSeen = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture),
                 PrinterCount = printerCount,
                 PendingSyncCount = pendingCount
             };
 
-            var (success, _, error) = await _apiClient.SendHeartbeatAsync(request, cancellationToken);
+            var (success, response, error) = await _apiClient.SendHeartbeatAsync(request, cancellationToken);
             if (success)
             {
                 _dbContext.UpdateHeartbeat(deviceId, DateTime.UtcNow);
                 _logger.LogDebug("Heartbeat sent successfully.");
+
+                // Process remote password updates from the Laravel Web Portal
+                if (response != null &&
+                    response.Command == "update_software_password" &&
+                    !string.IsNullOrWhiteSpace(response.NewPassword))
+                {
+                    _logger.LogInformation("Received remote password update command from Nexrein Printer Monitor Web Portal.");
+                    var newHash = PrintMonitor.Utilities.SecurityHelper.HashPassword(response.NewPassword);
+                    _settingsManager.SaveSettings(s =>
+                    {
+                        s.AdminPasswordHash = newHash;
+                    });
+
+                    await _apiClient.AcknowledgePasswordAsync(deviceId, cancellationToken);
+                    _logger.LogInformation("Desktop Super Admin password successfully updated and synchronized with cloud portal.");
+                }
+
                 return true;
             }
             else

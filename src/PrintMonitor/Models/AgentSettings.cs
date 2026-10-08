@@ -4,9 +4,11 @@ public class AgentSettings
 {
     public const string SectionName = "PrintMonitor";
 
-    public string ApiBaseUrl { get; set; } = "https://your-domain.com/api";
+    public string ApiBaseUrl { get; set; } = "https://printmonitor.nexreindigital.co.ke/api";
     public string ApiKey { get; set; } = string.Empty;
     public string DeviceId { get; set; } = string.Empty;
+    public string UserEmail { get; set; } = string.Empty;
+    public string ShopName { get; set; } = string.Empty;
     public int SyncIntervalSeconds { get; set; } = 30;
     public int HeartbeatIntervalSeconds { get; set; } = 60;
     public int PollingIntervalSeconds { get; set; } = 5;

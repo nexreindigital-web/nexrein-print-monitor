@@ -16,8 +16,9 @@ Write-Host "`nEnsuring Desktop Shortcuts..." -ForegroundColor Cyan
 & ".\scripts\create-desktop-shortcut.ps1"
 
 $desktopShortcuts = @(
-    "$env:USERPROFILE\Desktop\Nexrein Print Monitor.lnk",
-    "$env:USERPROFILE\OneDrive\Desktop\Nexrein Print Monitor.lnk"
+    "C:\Users\Public\Desktop\Nexrein Printer Monitor.lnk",
+    "$env:USERPROFILE\Desktop\Nexrein Printer Monitor.lnk",
+    "$env:USERPROFILE\OneDrive\Desktop\Nexrein Printer Monitor.lnk"
 )
 
 foreach ($sc in $desktopShortcuts) {

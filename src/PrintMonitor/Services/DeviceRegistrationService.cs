@@ -53,11 +53,13 @@ public class DeviceRegistrationService : IDeviceRegistrationService
         {
             DeviceId = comp.DeviceId,
             ComputerName = comp.ComputerName,
+            ShopName = _settingsManager.Settings.ShopName,
+            UserEmail = _settingsManager.Settings.UserEmail,
             WindowsUser = comp.WindowsUser,
             Domain = comp.Domain,
             OsVersion = comp.OsVersion,
             Architecture = comp.OsArchitecture,
-            ApplicationVersion = comp.ApplicationVersion,
+            ApplicationVersion = "2.0.0",
             IpAddress = comp.IpAddress,
             MacAddress = comp.MacAddress
         };

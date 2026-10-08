@@ -42,7 +42,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Settings/Database initialization notice: {ex.Message}", "Nexrein Print Monitor", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show($"Settings/Database initialization notice: {ex.Message}", "Nexrein Printer Monitor", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         InitializeComponent();
@@ -61,6 +61,13 @@ public partial class MainWindow : Window
         _isUpdatingUi = false;
         LoadAllData();
         _refreshTimer.Start();
+
+        // Check for updates in the background (non-blocking)
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(2000);
+            await Dispatcher.InvokeAsync(() => RunUpdateCheckAsync(isManualClick: false));
+        });
     }
 
     private void RefreshTimer_Tick(object? sender, EventArgs e)
@@ -846,7 +853,9 @@ public partial class MainWindow : Window
     {
         if (!_isLoaded || _settingsManager == null || TxtApiBaseUrl == null) return;
         var s = _settingsManager.Settings;
-        TxtApiBaseUrl.Text = s.ApiBaseUrl;
+        if (TxtUserEmail != null) TxtUserEmail.Text = s.UserEmail ?? string.Empty;
+        if (TxtShopName != null) TxtShopName.Text = s.ShopName ?? string.Empty;
+        TxtApiBaseUrl.Text = string.IsNullOrWhiteSpace(s.ApiBaseUrl) ? "https://printmonitor.nexreindigital.co.ke/api" : s.ApiBaseUrl;
         TxtApiKey.Text = s.ApiKey;
         TxtSyncInterval.Text = s.SyncIntervalSeconds.ToString();
         TxtHeartbeatInterval.Text = s.HeartbeatIntervalSeconds.ToString();
@@ -869,7 +878,9 @@ public partial class MainWindow : Window
 
         try
         {
-            var url = TxtApiBaseUrl.Text?.Trim() ?? "https://your-domain.com/api";
+            var userEmail = TxtUserEmail?.Text?.Trim() ?? string.Empty;
+            var shopName = TxtShopName?.Text?.Trim() ?? string.Empty;
+            var url = TxtApiBaseUrl.Text?.Trim() ?? "https://printmonitor.nexreindigital.co.ke/api";
             var key = TxtApiKey.Text?.Trim() ?? string.Empty;
 
             int.TryParse(TxtSyncInterval.Text, out var syncSec);
@@ -885,6 +896,8 @@ public partial class MainWindow : Window
 
             _settingsManager.SaveSettings(s =>
             {
+                s.UserEmail = userEmail;
+                s.ShopName = shopName;
                 s.ApiBaseUrl = url;
                 s.ApiKey = key;
                 s.SyncIntervalSeconds = syncSec;
@@ -900,6 +913,11 @@ public partial class MainWindow : Window
         {
             MessageBox.Show($"Failed to save settings: {ex.Message}", "Save Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+    }
+
+    private void BtnOpenOnlineDashboard_Click(object sender, RoutedEventArgs e)
+    {
+        VersionController.OpenUrl("https://printmonitor.nexreindigital.co.ke");
     }
 
     private async void BtnTestApi_Click(object sender, RoutedEventArgs e)
@@ -1028,6 +1046,213 @@ public partial class MainWindow : Window
             else if (MainTabs.SelectedIndex == 4) LoadLogs();
         }
     }
+
+    #region Window Caption Controls (Minimize, Maximize / Restore, Close)
+
+    private void TopBar_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == System.Windows.Input.MouseButton.Left)
+        {
+            if (e.ClickCount == 2)
+            {
+                ToggleMaximize();
+            }
+            else
+            {
+                try
+                {
+                    DragMove();
+                }
+                catch
+                {
+                    // Ignore transient drag exceptions
+                }
+            }
+        }
+    }
+
+    private void BtnWinMinimize_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+
+    private void BtnWinMaximize_Click(object sender, RoutedEventArgs e)
+    {
+        ToggleMaximize();
+    }
+
+    private void ToggleMaximize()
+    {
+        if (WindowState == WindowState.Maximized)
+        {
+            WindowState = WindowState.Normal;
+        }
+        else
+        {
+            WindowState = WindowState.Maximized;
+        }
+    }
+
+    private void Window_StateChanged(object? sender, EventArgs e)
+    {
+        if (BtnWinMaximize != null)
+        {
+            if (WindowState == WindowState.Maximized)
+            {
+                BtnWinMaximize.Content = "🗗";
+                BtnWinMaximize.ToolTip = "Restore Window Down";
+            }
+            else
+            {
+                BtnWinMaximize.Content = "🗖";
+                BtnWinMaximize.ToolTip = "Maximize Window";
+            }
+        }
+    }
+
+    private void BtnWinClose_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
+    #endregion
+
+    #region Software Updates & Version Controller
+
+    private VersionCheckResult? _latestCheckResult;
+
+    private async void BtnCheckUpdates_Click(object sender, RoutedEventArgs e)
+    {
+        await RunUpdateCheckAsync(isManualClick: true);
+    }
+
+    private void BtnDownloadUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        var targetUrl = _latestCheckResult?.DownloadUrl;
+        if (string.IsNullOrWhiteSpace(targetUrl))
+        {
+            targetUrl = "https://github.com/nexreindigital-web/nexrein-print-monitor/releases/latest";
+        }
+        VersionController.OpenUrl(targetUrl);
+    }
+
+    private void BtnUpdateBadge_Click(object sender, RoutedEventArgs e)
+    {
+        if (MainTabs != null)
+        {
+            // Switch to Settings / Updates tab
+            MainTabs.SelectedIndex = 3;
+        }
+        BtnDownloadUpdate_Click(sender, e);
+    }
+
+    private async Task RunUpdateCheckAsync(bool isManualClick)
+    {
+        if (BtnCheckUpdates != null) BtnCheckUpdates.IsEnabled = false;
+        if (TxtUpdateStatusDetails != null && isManualClick)
+        {
+            TxtUpdateStatusDetails.Text = "Querying update server for latest version...";
+            TxtUpdateStatusDetails.Foreground = new SolidColorBrush(Color.FromRgb(56, 189, 248));
+        }
+
+        try
+        {
+            var apiBaseUrl = _settingsManager?.Settings?.ApiBaseUrl;
+            var apiKey = _settingsManager?.Settings?.ApiKey;
+
+            var result = await VersionController.CheckForUpdatesAsync(apiBaseUrl, apiKey);
+            _latestCheckResult = result;
+
+            if (TxtInstalledVer != null)
+                TxtInstalledVer.Text = $"{result.CurrentVersion} (win-x64 Enterprise)";
+
+            if (TxtLatestVer != null)
+                TxtLatestVer.Text = $"v{result.LatestVersion}";
+
+            if (result.UpdateAvailable)
+            {
+                if (BtnUpdateBadge != null)
+                {
+                    BtnUpdateBadge.Visibility = Visibility.Visible;
+                    BtnUpdateBadge.Content = $"🚀 Update v{result.LatestVersion} Available";
+                }
+
+                if (BtnDownloadUpdate != null)
+                {
+                    BtnDownloadUpdate.Visibility = Visibility.Visible;
+                }
+
+                if (TxtUpdateStatusDetails != null)
+                {
+                    TxtUpdateStatusDetails.Text = $"A newer version (v{result.LatestVersion}) is available. Your print database, statistics, and settings will remain completely intact when updating.";
+                    TxtUpdateStatusDetails.Foreground = new SolidColorBrush(Color.FromRgb(52, 211, 153));
+                }
+
+                if (TxtVersionPill != null)
+                {
+                    TxtVersionPill.Text = $"Update v{result.LatestVersion} Available";
+                }
+
+                if (isManualClick)
+                {
+                    var prompt = MessageBox.Show(
+                        $"A new update (v{result.LatestVersion}) for Nexrein Printer Monitor is available!\n\nWould you like to open the download page now?",
+                        "Update Available",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Information);
+
+                    if (prompt == MessageBoxResult.Yes)
+                    {
+                        BtnDownloadUpdate_Click(this, new RoutedEventArgs());
+                    }
+                }
+            }
+            else
+            {
+                if (BtnUpdateBadge != null) BtnUpdateBadge.Visibility = Visibility.Collapsed;
+                if (BtnDownloadUpdate != null) BtnDownloadUpdate.Visibility = Visibility.Collapsed;
+
+                if (TxtUpdateStatusDetails != null)
+                {
+                    TxtUpdateStatusDetails.Text = $"Nexrein Printer Monitor is up to date (v{result.CurrentVersion}). No updates are currently required.";
+                    TxtUpdateStatusDetails.Foreground = new SolidColorBrush(Color.FromRgb(148, 163, 184));
+                }
+
+                if (TxtVersionPill != null)
+                {
+                    TxtVersionPill.Text = $"Up to date: v{result.CurrentVersion}";
+                }
+
+                if (isManualClick)
+                {
+                    MessageBox.Show(
+                        $"Nexrein Printer Monitor is up to date (v{result.CurrentVersion}).\n\nNo updates are needed at this time.",
+                        "Check for Updates",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (TxtUpdateStatusDetails != null)
+            {
+                TxtUpdateStatusDetails.Text = $"Notice: Update check encountered an error: {ex.Message}";
+                TxtUpdateStatusDetails.Foreground = new SolidColorBrush(Color.FromRgb(248, 113, 113));
+            }
+
+            if (isManualClick)
+            {
+                MessageBox.Show($"Could not check for updates: {ex.Message}", "Check for Updates", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+        finally
+        {
+            if (BtnCheckUpdates != null) BtnCheckUpdates.IsEnabled = true;
+        }
+    }
+
+    #endregion
 }
 
 public class PrintJobDisplayItem

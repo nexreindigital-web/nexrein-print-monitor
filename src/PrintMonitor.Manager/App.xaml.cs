@@ -10,12 +10,12 @@ public partial class App : Application
         AppDomain.CurrentDomain.UnhandledException += (s, args) =>
         {
             var ex = args.ExceptionObject as Exception;
-            MessageBox.Show($"Startup Error:\n\n{ex?.Message}\n\n{ex?.StackTrace}", "Nexrein Print Monitor Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"Startup Error:\n\n{ex?.Message}\n\n{ex?.StackTrace}", "Nexrein Printer Monitor Error", MessageBoxButton.OK, MessageBoxImage.Error);
         };
 
         DispatcherUnhandledException += (s, args) =>
         {
-            MessageBox.Show($"Application Error:\n\n{args.Exception?.Message}\n\n{args.Exception?.StackTrace}", "Nexrein Print Monitor Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"Application Error:\n\n{args.Exception?.Message}\n\n{args.Exception?.StackTrace}", "Nexrein Printer Monitor Error", MessageBoxButton.OK, MessageBoxImage.Error);
             args.Handled = true;
         };
 
