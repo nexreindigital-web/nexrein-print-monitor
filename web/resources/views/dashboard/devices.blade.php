@@ -1,59 +1,115 @@
 @extends('layouts.portal')
 
-@section('title', 'Computers & Shops Management')
+@section('title', 'Computers & Shops')
 
 @push('styles')
 <style>
     .device-grid {
         display: grid;
-        grid-template-columns: 1fr 360px;
-        gap: 1.5rem;
+        grid-template-columns: 1fr 340px;
+        gap: 1.25rem;
         align-items: start;
     }
-    @media (max-width: 1024px) {
+    @media (max-width: 1040px) {
         .device-grid { grid-template-columns: 1fr; }
     }
 
     .table-card {
-        background: var(--bg-card);
+        background-color: var(--bg-card);
         border: 1px solid var(--border-color);
-        border-radius: 14px;
-        overflow: hidden;
+        border-radius: 6px;
+        padding: 1.15rem 1.25rem;
     }
 
     .table-header {
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid var(--border-color);
         display: flex;
         align-items: center;
         justify-content: space-between;
+        margin-bottom: 1rem;
     }
 
     .password-card {
-        background: var(--bg-card);
-        border: 1px solid #4F46E5;
-        border-radius: 14px;
-        padding: 1.75rem;
-        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.15);
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 1.25rem;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8rem;
+        text-align: left;
+    }
+
+    .data-table th {
+        background-color: var(--table-header-bg);
+        color: var(--text-secondary);
+        font-weight: 700;
+        font-size: 0.7rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        padding: 0.65rem 0.85rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .data-table td {
+        padding: 0.65rem 0.85rem;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-primary);
+        vertical-align: middle;
+    }
+
+    .data-table tr:nth-child(even) td {
+        background-color: var(--table-row-alt);
     }
 
     .status-dot {
-        width: 10px;
-        height: 10px;
+        width: 7px;
+        height: 7px;
         border-radius: 50%;
         display: inline-block;
-        margin-right: 6px;
+        margin-right: 5px;
     }
-    .status-dot.online { background-color: var(--accent-emerald); box-shadow: 0 0 8px var(--accent-emerald); }
-    .status-dot.offline { background-color: var(--text-muted); }
+    .status-dot.online { background-color: #10B981; }
+    .status-dot.offline { background-color: #64748B; }
+
+    .form-control-theme {
+        width: 100%;
+        background-color: var(--bg-input);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 0.6rem 0.8rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        outline: none;
+    }
+    .form-control-theme:focus {
+        border-color: #38BDF8;
+    }
+
+    .btn-push {
+        width: 100%;
+        background-color: #38BDF8;
+        color: #0F172A;
+        font-weight: 700;
+        border: none;
+        padding: 0.7rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.15s;
+    }
+    .btn-push:hover {
+        background-color: #0EA5E9;
+    }
 </style>
 @endpush
 
 @section('content')
-<div style="margin-bottom: 1.5rem;">
-    <h1 style="font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em;">Connected Computers &amp; Shop Terminals</h1>
-    <p style="color: var(--text-secondary); font-size: 0.9rem;">
-        Monitor workstation connectivity, shop identities, and centrally manage desktop software security passwords.
+<div style="margin-bottom: 1.25rem;">
+    <h1 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary);">Connected Computers &amp; Shop Stations</h1>
+    <p style="color: var(--text-secondary); font-size: 0.78rem; margin-top: 2px;">
+        Monitor real-time workstation heartbeats and sync passwords across your fleet.
     </p>
 </div>
 
@@ -61,21 +117,22 @@
     <!-- Devices List -->
     <div class="table-card">
         <div class="table-header">
-            <h2 style="font-size: 1.15rem; font-weight: 700;">💻 Registered Workstations ({{ $devices->count() }})</h2>
+            <h2 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">
+                Registered Workstations ({{ $devices->count() }})
+            </h2>
         </div>
 
         <div style="overflow-x: auto;">
-            <table>
+            <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Status</th>
-                        <th>Shop / Branch</th>
-                        <th>Computer Name</th>
-                        <th>User Email</th>
-                        <th>Total Pages</th>
-                        <th>Printers</th>
-                        <th>Last Heartbeat</th>
-                        <th>Software Password</th>
+                        <th>STATUS</th>
+                        <th>SHOP / BRANCH</th>
+                        <th>COMPUTER</th>
+                        <th>USER EMAIL</th>
+                        <th>PAGES</th>
+                        <th>PRINTERS</th>
+                        <th>LAST HEARTBEAT</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -83,47 +140,30 @@
                         <tr>
                             <td>
                                 @if ($d->isOnline())
-                                    <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3);">
-                                        <span class="status-dot online"></span> Online
+                                    <span style="display: inline-flex; align-items: center; background-color: var(--badge-completed-bg); border: 1px solid var(--badge-completed-border); color: var(--badge-completed-fg); border-radius: 9999px; padding: 2px 8px; font-size: 0.68rem; font-weight: 700;">
+                                        <span class="status-dot online"></span> ONLINE
                                     </span>
                                 @else
-                                    <span class="badge" style="background: rgba(107, 114, 128, 0.15); color: #9CA3AF; border: 1px solid rgba(107, 114, 128, 0.3);">
-                                        <span class="status-dot offline"></span> Offline
+                                    <span style="display: inline-flex; align-items: center; background-color: rgba(100, 116, 139, 0.15); border: 1px solid #64748B; color: #94A3B8; border-radius: 9999px; padding: 2px 8px; font-size: 0.68rem; font-weight: 700;">
+                                        <span class="status-dot offline"></span> OFFLINE
                                     </span>
                                 @endif
                             </td>
                             <td>
-                                <strong style="color: white;">{{ $d->shop_name }}</strong>
+                                <strong>{{ $d->shop_name }}</strong>
                             </td>
-                            <td style="color: #93C5FD;">{{ $d->computer_name }}</td>
+                            <td style="color: var(--accent-primary); font-weight: 600;">{{ $d->computer_name }}</td>
                             <td>{{ $d->user_email }}</td>
-                            <td>
-                                <strong style="color: #38BDF8;">{{ number_format($d->print_jobs_sum_total_pages_calculated ?: 0) }}</strong>
-                            </td>
+                            <td style="font-weight: 700;">{{ number_format($d->print_jobs_sum_total_pages_calculated ?: 0) }}</td>
                             <td>{{ $d->printers_count }}</td>
-                            <td style="color: var(--text-secondary); font-size: 0.8rem;">
+                            <td style="color: var(--text-secondary); font-size: 0.74rem;">
                                 {{ $d->last_heartbeat_at ? $d->last_heartbeat_at->diffForHumans() : 'Never' }}
-                            </td>
-                            <td>
-                                @if ($d->pending_password_update)
-                                    <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3);">
-                                        ⏳ Syncing Update...
-                                    </span>
-                                @elseif ($d->software_password)
-                                    <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #93C5FD; border: 1px solid rgba(59, 130, 246, 0.3);">
-                                        🔒 Custom (Active)
-                                    </span>
-                                @else
-                                    <span class="badge" style="background: rgba(107, 114, 128, 0.15); color: #D1D5DB; border: 1px solid rgba(107, 114, 128, 0.3);">
-                                        Default
-                                    </span>
-                                @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
-                                📭 No desktop computers connected yet. Run the installer on a workstation to automatically register it.
+                            <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-secondary);">
+                                No desktop computers connected yet. Run the installer on a workstation to automatically link it here.
                             </td>
                         </tr>
                     @endforelse
@@ -134,26 +174,28 @@
 
     <!-- Centralized Desktop Password Manager Card -->
     <div class="password-card">
-        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
-            <div style="font-size: 1.75rem;">🔑</div>
+        <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.85rem;">
+            <div style="width: 32px; height: 32px; background-color: #38BDF8; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #0F172A; font-weight: bold;">
+                🔑
+            </div>
             <div>
-                <h3 style="font-size: 1.15rem; font-weight: 700;">Remote Software Password</h3>
-                <p style="font-size: 0.8rem; color: var(--text-secondary);">Centrally update desktop super admin credentials.</p>
+                <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">Push Software Password</h3>
+                <p style="font-size: 0.72rem; color: var(--text-secondary);">Update desktop admin password remotely.</p>
             </div>
         </div>
 
-        <p style="font-size: 0.825rem; color: #C7D2FE; margin-bottom: 1.25rem; line-height: 1.45;">
-            Changing the password here pushes the update directly to the selected Windows desktop agent on its next 3-second heartbeat, updating its local admin password automatically!
+        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.45;">
+            Updates stage immediately and are applied by each desktop agent within 10 seconds via background heartbeat.
         </p>
 
         <form action="{{ route('devices.update_software_password') }}" method="POST">
             @csrf
 
-            <div style="margin-bottom: 1rem;">
-                <label style="display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.35rem;">
-                    Target Computer or Shop
+            <div style="margin-bottom: 0.85rem;">
+                <label style="display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.35rem;">
+                    Target Workstation
                 </label>
-                <select name="device_id" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-light); color: white; padding: 0.65rem; border-radius: 8px; font-size: 0.85rem;" required>
+                <select name="device_id" class="form-control-theme" required>
                     <option value="all">🌐 ALL Connected Computers</option>
                     @foreach ($devices as $d)
                         <option value="{{ $d->device_id }}">{{ $d->shop_name }} ({{ $d->computer_name }})</option>
@@ -161,15 +203,15 @@
                 </select>
             </div>
 
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.35rem;">
+            <div style="margin-bottom: 1.15rem;">
+                <label style="display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.35rem;">
                     New Desktop Admin Password
                 </label>
-                <input type="password" name="new_password" placeholder="Enter new password" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-light); color: white; padding: 0.65rem; border-radius: 8px; font-size: 0.9rem;" required minlength="4">
+                <input type="password" name="new_password" class="form-control-theme" placeholder="Enter new password" required minlength="4">
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.8rem;">
-                🚀 Push &amp; Update Desktop Password
+            <button type="submit" class="btn-push">
+                Push &amp; Update Desktop Password
             </button>
         </form>
     </div>

@@ -13,14 +13,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::updateOrCreate(
-            ['email' => 'admin@nexreindigital.co.ke'],
-            [
-                'name'                 => 'Super Admin',
-                'password'             => Hash::make('admin'), // Default initial password 'admin'
-                'shop_name'            => 'Headquarters',
-                'must_change_password' => true,
-            ]
-        );
+        // Clean fresh installation: No dummy users, jobs, or mock data.
+        // Client user accounts and workstation devices are provisioned dynamically 
+        // when the software is installed and authenticated via API.
     }
 }

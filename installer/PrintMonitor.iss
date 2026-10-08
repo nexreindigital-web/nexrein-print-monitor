@@ -223,8 +223,8 @@ begin
         '  "ApiKey": "",'#13#10 +
         '  "UserEmail": "' + UserEmailInput + '",'#13#10 +
         '  "ShopName": "' + ShopNameInput + '",'#13#10 +
-        '  "SyncIntervalSeconds": 30,'#13#10 +
-        '  "HeartbeatIntervalSeconds": 60,'#13#10 +
+        '  "SyncIntervalSeconds": 10,'#13#10 +
+        '  "HeartbeatIntervalSeconds": 10,'#13#10 +
         '  "PollingIntervalSeconds": 5,'#13#10 +
         '  "DatabasePath": "C:\\ProgramData\\PrintMonitor\\printmonitor.db",'#13#10 +
         '  "LogDirectory": "C:\\ProgramData\\PrintMonitor\\Logs",'#13#10 +

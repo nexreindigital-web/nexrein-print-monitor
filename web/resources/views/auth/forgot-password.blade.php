@@ -5,105 +5,109 @@
 @push('styles')
 <style>
     .auth-wrapper {
-        min-height: 80vh;
+        min-height: 75vh;
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 2rem 1rem;
     }
 
     .auth-card {
-        background: var(--bg-card);
+        background-color: var(--bg-card);
         border: 1px solid var(--border-color);
-        border-radius: 16px;
-        padding: 2.5rem;
+        border-radius: 8px;
+        padding: 2.25rem 2.5rem;
         width: 100%;
-        max-width: 460px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+        max-width: 440px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
     }
 
     .auth-header {
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.75rem;
     }
 
-    .auth-icon {
-        width: 60px;
-        height: 60px;
-        margin: 0 auto 1.25rem;
-        background: linear-gradient(135deg, #F59E0B, #D97706);
-        border-radius: 16px;
-        display: flex;
+    .brand-badge-center {
+        width: 42px;
+        height: 42px;
+        background-color: #38BDF8;
+        border-radius: 8px;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 2rem;
-        box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
+        color: #FFFFFF;
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin-bottom: 0.85rem;
     }
 
     .auth-title {
-        font-size: 1.5rem;
-        font-weight: 800;
-        margin-bottom: 0.35rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.01em;
+        margin-bottom: 0.25rem;
     }
 
     .auth-subtitle {
         color: var(--text-secondary);
-        font-size: 0.875rem;
-        line-height: 1.4;
+        font-size: 0.78rem;
     }
 
     .form-group {
-        margin-bottom: 1.25rem;
+        margin-bottom: 1.15rem;
     }
 
     .form-label {
         display: block;
-        font-size: 0.85rem;
+        font-size: 0.78rem;
         font-weight: 600;
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.35rem;
         color: var(--text-secondary);
     }
 
     .form-control {
         width: 100%;
-        background: var(--bg-input);
-        border: 1px solid var(--border-light);
-        border-radius: 8px;
-        padding: 0.75rem 1rem;
-        color: white;
-        font-size: 0.95rem;
+        background-color: var(--bg-input);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 0.65rem 0.85rem;
+        color: var(--text-primary);
+        font-size: 0.88rem;
+        outline: none;
+        transition: border-color 0.2s;
     }
 
     .form-control:focus {
-        outline: none;
-        border-color: var(--accent-blue);
+        border-color: #38BDF8;
+        box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
     }
 
     .btn-submit {
         width: 100%;
-        padding: 0.85rem;
-        font-size: 0.95rem;
+        background-color: #38BDF8;
+        color: #0F172A;
+        border: none;
+        padding: 0.75rem;
+        font-size: 0.88rem;
         font-weight: 700;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.15s;
+    }
+    .btn-submit:hover {
+        background-color: #0EA5E9;
     }
 
     .back-link {
         display: block;
         text-align: center;
-        margin-top: 1.5rem;
-        color: #9CA3AF;
-        text-decoration: none;
-        font-size: 0.875rem;
-    }
-    .back-link:hover { color: white; text-decoration: underline; }
-
-    .reset-link-box {
         margin-top: 1.25rem;
-        background: rgba(16, 185, 129, 0.1);
-        border: 1px solid rgba(16, 185, 129, 0.3);
-        border-radius: 8px;
-        padding: 1rem;
-        word-break: break-all;
-        font-size: 0.85rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.78rem;
     }
+    .back-link:hover { color: var(--text-primary); text-decoration: underline; }
 </style>
 @endpush
 
@@ -111,19 +115,25 @@
 <div class="auth-wrapper">
     <div class="auth-card">
         <div class="auth-header">
-            <div class="auth-icon">🔑</div>
-            <h2 class="auth-title">Password Recovery</h2>
-            <p class="auth-subtitle">Enter your registered user email address to reset your dashboard password.</p>
+            <div class="brand-badge-center">N</div>
+            <h2 class="auth-title">Reset Your Password</h2>
+            <p class="auth-subtitle">
+                Enter your registered administrator email to receive a password reset authorization.
+            </p>
         </div>
 
         @if (session('status'))
-            <div class="alert alert-success" style="margin-bottom: 1.25rem; flex-direction: column; align-items: flex-start; gap: 0.5rem;">
-                <div>{{ session('status') }}</div>
-                @if (session('reset_url'))
-                    <div class="reset-link-box">
-                        <a href="{{ session('reset_url') }}" style="color: #6EE7B7; font-weight: 700;">🔗 Click Here to Reset Password</a>
-                    </div>
-                @endif
+            <div class="alert alert-success" style="margin-bottom: 1.25rem;">
+                <div>
+                    {{ session('status') }}
+                    @if (session('reset_url'))
+                        <div style="margin-top: 0.75rem; word-break: break-all;">
+                            <a href="{{ session('reset_url') }}" class="btn-submit" style="display: block; text-align: center; text-decoration: none; padding: 0.6rem; font-size: 0.8rem;">
+                                ➔ Click Here to Set New Password
+                            </a>
+                        </div>
+                    @endif
+                </div>
             </div>
         @endif
 
@@ -137,7 +147,7 @@
             </div>
         @endif
 
-        <form action="{{ route('password.forgot.post') }}" method="POST">
+        <form action="{{ route('password.email') }}" method="POST">
             @csrf
 
             <div class="form-group">
@@ -145,13 +155,13 @@
                 <input type="email" id="email" name="email" class="form-control" placeholder="user@company.com" value="{{ old('email') }}" required autofocus>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-submit">
-                ✉️ Send Password Reset Authorization
+            <button type="submit" class="btn-submit">
+                Request Password Reset
             </button>
         </form>
 
         <a href="{{ route('login') }}" class="back-link">
-            ← Back to Sign In
+            ← Return to Sign In
         </a>
     </div>
 </div>

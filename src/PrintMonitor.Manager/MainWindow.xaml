@@ -1,63 +1,94 @@
 <Window x:Class="PrintMonitor.Manager.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Nexrein Printer Monitor — Enterprise Control Panel &amp; Manager"
+        Title="Nexrein Printer Monitor — Enterprise Print Accounting &amp; Spooler Management"
         Icon="Resources/app.ico"
-        Height="840" Width="1260"
-        MinHeight="660" MinWidth="1040"
+        Height="860" Width="1280"
+        MinHeight="700" MinWidth="1100"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource BgWindow}"
         Foreground="{DynamicResource TextPrimary}"
-        FontFamily="Segoe UI, Inter, Arial"
+        FontFamily="Segoe UI, -apple-system, BlinkMacSystemFont, Arial"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
         StateChanged="Window_StateChanged">
 
     <Window.Resources>
-        <!-- Dynamic Theme Color Tokens (Defaults to Midnight Dark, switched dynamically by ThemeManager) -->
-        <SolidColorBrush x:Key="BgWindow" Color="#0B0F19" />
-        <SolidColorBrush x:Key="BgHeader" Color="#111827" />
-        <SolidColorBrush x:Key="BgCard" Color="#1A2234" />
-        <SolidColorBrush x:Key="BgCardHover" Color="#243048" />
-        <SolidColorBrush x:Key="BgInput" Color="#111827" />
-        <SolidColorBrush x:Key="BorderColor" Color="#26334D" />
-        <SolidColorBrush x:Key="BorderLight" Color="#334155" />
+        <!-- Dynamic Theme Color Tokens (Switched dynamically by ThemeManager) -->
+        <SolidColorBrush x:Key="BgWindow" Color="#0A0F1D" />
+        <SolidColorBrush x:Key="BgHeader" Color="#0C1322" />
+        <SolidColorBrush x:Key="BgCard" Color="#111C35" />
+        <SolidColorBrush x:Key="BgCardHover" Color="#162342" />
+        <SolidColorBrush x:Key="BgInput" Color="#0E172E" />
+        <SolidColorBrush x:Key="BorderColor" Color="#1E2D4A" />
+        <SolidColorBrush x:Key="BorderLight" Color="#2A3B5E" />
 
-        <SolidColorBrush x:Key="TextPrimary" Color="#F8FAFC" />
+        <SolidColorBrush x:Key="TextPrimary" Color="#FFFFFF" />
         <SolidColorBrush x:Key="TextSecondary" Color="#94A3B8" />
         <SolidColorBrush x:Key="TextMuted" Color="#64748B" />
 
-        <SolidColorBrush x:Key="AccentPrimary" Color="#6366F1" />
-        <SolidColorBrush x:Key="AccentPrimaryHover" Color="#4F46E5" />
+        <SolidColorBrush x:Key="AccentPrimary" Color="#38BDF8" />
+        <SolidColorBrush x:Key="AccentPrimaryHover" Color="#0EA5E9" />
         <SolidColorBrush x:Key="AccentSuccess" Color="#10B981" />
         <SolidColorBrush x:Key="AccentSuccessHover" Color="#059669" />
         <SolidColorBrush x:Key="AccentWarning" Color="#F59E0B" />
-        <SolidColorBrush x:Key="AccentDanger" Color="#EF4444" />
-        <SolidColorBrush x:Key="AccentDangerHover" Color="#DC2626" />
-        <SolidColorBrush x:Key="AccentInfo" Color="#0EA5E9" />
+        <SolidColorBrush x:Key="AccentDanger" Color="#DC2626" />
+        <SolidColorBrush x:Key="AccentDangerHover" Color="#B91C1C" />
+        <SolidColorBrush x:Key="AccentInfo" Color="#22D3EE" />
 
-        <SolidColorBrush x:Key="DataGridHeaderBg" Color="#111827" />
-        <SolidColorBrush x:Key="DataGridRowBg" Color="#1A2234" />
-        <SolidColorBrush x:Key="DataGridRowAlt" Color="#141C2D" />
-        <SolidColorBrush x:Key="DataGridSelected" Color="#2E3856" />
+        <SolidColorBrush x:Key="TabActiveBorder" Color="#38BDF8" />
+        <SolidColorBrush x:Key="TabActiveFg" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="TabInactiveFg" Color="#94A3B8" />
 
-        <SolidColorBrush x:Key="LockBadgeBg" Color="#312E81" />
-        <SolidColorBrush x:Key="LockBadgeFg" Color="#C7D2FE" />
+        <SolidColorBrush x:Key="HeaderBtnBg" Color="#1E293B" />
+        <SolidColorBrush x:Key="HeaderBtnBorder" Color="#334155" />
+        <SolidColorBrush x:Key="HeaderBtnFg" Color="#E2E8F0" />
 
-        <!-- Button Styles -->
-        <Style x:Key="PrimaryBtn" TargetType="Button">
-            <Setter Property="Background" Value="{DynamicResource AccentPrimary}" />
-            <Setter Property="Foreground" Value="White" />
+        <SolidColorBrush x:Key="ServiceBadgeBg" Color="#022C22" />
+        <SolidColorBrush x:Key="ServiceBadgeBorder" Color="#059669" />
+        <SolidColorBrush x:Key="ServiceBadgeFg" Color="#34D399" />
+
+        <SolidColorBrush x:Key="SectionBtnBg" Color="#111C35" />
+        <SolidColorBrush x:Key="SectionBtnBorder" Color="#1E2D4A" />
+        <SolidColorBrush x:Key="SectionBtnFg" Color="#FFFFFF" />
+
+        <SolidColorBrush x:Key="KpiVal1" Color="#38BDF8" />
+        <SolidColorBrush x:Key="KpiVal2" Color="#22D3EE" />
+        <SolidColorBrush x:Key="KpiVal3" Color="#CBD5E1" />
+        <SolidColorBrush x:Key="KpiVal4" Color="#C084FC" />
+        <SolidColorBrush x:Key="KpiVal5" Color="#34D399" />
+        <SolidColorBrush x:Key="KpiVal6" Color="#FB923C" />
+
+        <SolidColorBrush x:Key="DataGridHeaderBg" Color="#111C35" />
+        <SolidColorBrush x:Key="DataGridRowBg" Color="#111C35" />
+        <SolidColorBrush x:Key="DataGridRowAlt" Color="#0E172E" />
+        <SolidColorBrush x:Key="DataGridSelected" Color="#1E2D4A" />
+
+        <SolidColorBrush x:Key="BadgeColorBg" Color="#0891B2" />
+        <SolidColorBrush x:Key="BadgeCompletedBg" Color="#022C22" />
+        <SolidColorBrush x:Key="BadgeCompletedBorder" Color="#059669" />
+        <SolidColorBrush x:Key="BadgeCompletedFg" Color="#34D399" />
+
+        <SolidColorBrush x:Key="FooterBg" Color="#0C1322" />
+        <SolidColorBrush x:Key="FooterFg" Color="#94A3B8" />
+
+        <!-- Base Button Styles -->
+        <Style x:Key="HeaderActionBtn" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource HeaderBtnBg}" />
+            <Setter Property="Foreground" Value="{DynamicResource HeaderBtnFg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource HeaderBtnBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
             <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="FontSize" Value="13" />
-            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Padding" Value="14,6" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}"
-                                CornerRadius="7"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
@@ -66,16 +97,79 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource AccentPrimaryHover}" />
-                </Trigger>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.5" />
+                    <Setter Property="Background" Value="#334155" />
                 </Trigger>
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="SuccessBtn" TargetType="Button" BasedOn="{StaticResource PrimaryBtn}">
+        <Style x:Key="DangerStopBtn" TargetType="Button" BasedOn="{StaticResource HeaderActionBtn}">
+            <Setter Property="Background" Value="#DC2626" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="White" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#B91C1C" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SkyRefreshBtn" TargetType="Button" BasedOn="{StaticResource HeaderActionBtn}">
+            <Setter Property="Background" Value="#38BDF8" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="#0F172A" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#0EA5E9" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SectionActionBtn" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource SectionBtnBg}" />
+            <Setter Property="Foreground" Value="{DynamicResource SectionBtnFg}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SectionBtnBorder}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource BgCardHover}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="PrimaryBtn" TargetType="Button" BasedOn="{StaticResource SectionActionBtn}">
+            <Setter Property="Background" Value="{DynamicResource AccentPrimary}" />
+            <Setter Property="Foreground" Value="#0F172A" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource AccentPrimaryHover}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SuccessBtn" TargetType="Button" BasedOn="{StaticResource SectionActionBtn}">
             <Setter Property="Background" Value="{DynamicResource AccentSuccess}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="{DynamicResource AccentSuccessHover}" />
@@ -83,8 +177,10 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="DangerBtn" TargetType="Button" BasedOn="{StaticResource PrimaryBtn}">
+        <Style x:Key="DangerBtn" TargetType="Button" BasedOn="{StaticResource SectionActionBtn}">
             <Setter Property="Background" Value="{DynamicResource AccentDanger}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="{DynamicResource AccentDangerHover}" />
@@ -92,25 +188,15 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="SecondaryBtn" TargetType="Button" BasedOn="{StaticResource PrimaryBtn}">
-            <Setter Property="Background" Value="{DynamicResource BgCardHover}" />
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource BorderLight}" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        <Style x:Key="SecondaryBtn" TargetType="Button" BasedOn="{StaticResource SectionActionBtn}" />
 
-        <!-- Window Caption Controls Style -->
+        <!-- Caption Control Buttons -->
         <Style x:Key="CaptionBtn" TargetType="Button">
-            <Setter Property="Background" Value="{DynamicResource BgCardHover}" />
-            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
-            <Setter Property="Width" Value="36" />
-            <Setter Property="Height" Value="32" />
-            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#94A3B8" />
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="FontSize" Value="12" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="BorderThickness" Value="0" />
@@ -118,7 +204,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="6">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                     </ControlTemplate>
@@ -126,8 +212,8 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource BorderLight}" />
-                    <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+                    <Setter Property="Background" Value="#1E293B" />
+                    <Setter Property="Foreground" Value="White" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -135,56 +221,57 @@
         <Style x:Key="CaptionCloseBtn" TargetType="Button" BasedOn="{StaticResource CaptionBtn}">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource AccentDanger}" />
+                    <Setter Property="Background" Value="#DC2626" />
                     <Setter Property="Foreground" Value="White" />
                 </Trigger>
             </Style.Triggers>
         </Style>
 
-        <!-- Modern Metric Card Style -->
-        <Style x:Key="MetricCard" TargetType="Border">
-            <Setter Property="Background" Value="{DynamicResource BgCard}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="12" />
-            <Setter Property="Padding" Value="18,16" />
-        </Style>
-
-        <!-- Tab Styles -->
+        <!-- Underline TabItem Style -->
         <Style TargetType="TabControl">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
         </Style>
 
         <Style TargetType="TabItem">
-            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+            <Setter Property="Foreground" Value="{DynamicResource TabInactiveFg}" />
             <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="13" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Padding" Value="18,12" />
+            <Setter Property="Padding" Value="12,10" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem">
                         <Border x:Name="TabBorder"
                                 Background="Transparent"
-                                BorderThickness="0,0,0,3"
+                                BorderThickness="0,0,0,2.5"
                                 BorderBrush="Transparent"
-                                Margin="0,0,10,0"
+                                Margin="0,0,16,0"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="{DynamicResource AccentPrimary}" />
-                                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="{DynamicResource TabActiveBorder}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TabActiveFg}" />
+                                <Setter Property="FontWeight" Value="Bold" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+                                <Setter Property="Foreground" Value="{DynamicResource TabActiveFg}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <!-- Metric Card Border -->
+        <Style x:Key="MetricCard" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource BgCard}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="14,12" />
         </Style>
 
         <!-- Input Style -->
@@ -193,7 +280,7 @@
             <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
             <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="Padding" Value="8,6" />
             <Setter Property="FontSize" Value="13" />
             <Setter Property="CaretBrush" Value="{DynamicResource TextPrimary}" />
             <Setter Property="Template">
@@ -202,7 +289,7 @@
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="7">
+                                CornerRadius="5">
                             <ScrollViewer x:Name="PART_ContentHost" Margin="0" />
                         </Border>
                     </ControlTemplate>
@@ -225,15 +312,15 @@
             <Setter Property="IsReadOnly" Value="True" />
             <Setter Property="GridLinesVisibility" Value="Horizontal" />
             <Setter Property="SelectionMode" Value="Single" />
-            <Setter Property="RowHeight" Value="38" />
+            <Setter Property="RowHeight" Value="36" />
         </Style>
 
         <Style TargetType="DataGridColumnHeader">
             <Setter Property="Background" Value="{DynamicResource DataGridHeaderBg}" />
             <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
             <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="Padding" Value="12,9" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Padding" Value="12,8" />
             <Setter Property="BorderThickness" Value="0,0,0,1" />
             <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
         </Style>
@@ -261,426 +348,406 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <!-- Top App Bar -->
-            <RowDefinition Height="76" />
+            <!-- Fixed Deep Navy Header with Brand, Actions & Sub-Tabs -->
+            <RowDefinition Height="Auto" />
             <!-- Main Content Area -->
             <RowDefinition Height="*" />
-            <!-- Bottom Status Bar -->
-            <RowDefinition Height="36" />
+            <!-- Footer Status Bar -->
+            <RowDefinition Height="32" />
         </Grid.RowDefinitions>
 
-        <!-- TOP BAR -->
-        <Border Grid.Row="0" Background="{DynamicResource BgHeader}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="0,0,0,1" Padding="20,0" MouseDown="TopBar_MouseDown">
-            <Grid VerticalAlignment="Center">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+        <!-- TOP HEADER (Midnight Navy #0C1322 in both themes) -->
+        <Border Grid.Row="0" Background="{DynamicResource BgHeader}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="0,0,0,1" MouseDown="TopBar_MouseDown">
+            <StackPanel>
+                <!-- Row 1: Brand & Actions -->
+                <Grid Margin="24,14,24,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-                <!-- App Logo & Title with AI Icon -->
-                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Border Width="46" Height="46" CornerRadius="12" Margin="0,0,14,0" ClipToBounds="True">
-                        <Image Source="Resources/app.png" RenderOptions.BitmapScalingMode="HighQuality" />
-                    </Border>
-                    <StackPanel VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Nexrein Printer Monitor" FontWeight="Bold" FontSize="19" Foreground="{DynamicResource TextPrimary}" />
-                            <Border Background="{DynamicResource LockBadgeBg}" BorderThickness="1" BorderBrush="{DynamicResource AccentPrimary}" CornerRadius="10" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
-                                <TextBlock Text="🔒 Super Admin Protected" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource LockBadgeFg}" />
-                            </Border>
+                    <!-- Left: Brand Logo (Sky Blue "N" Square) + Title + Subtitle -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="34" Height="34" CornerRadius="6" Background="#38BDF8" Margin="0,0,12,0">
+                            <TextBlock Text="N" FontWeight="Bold" FontSize="19" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-1,0,0" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Nexrein Printer Monitor" FontWeight="Bold" FontSize="15" Foreground="White" />
+                            <TextBlock Text="Enterprise Print Accounting &amp; Spooler Management" FontSize="11" Foreground="#94A3B8" Margin="0,1,0,0" />
                         </StackPanel>
-                        <TextBlock Text="Enterprise Spooler Monitor, Cloud Accounting &amp; Workstation Agent" FontSize="12" Foreground="{DynamicResource TextSecondary}" />
                     </StackPanel>
-                </StackPanel>
 
-                <!-- Top Right Status & Controls -->
-                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                    <!-- Update Available Notification Badge -->
-                    <Button x:Name="BtnUpdateBadge" Content="🚀 Update Available" Style="{StaticResource SuccessBtn}" Padding="10,6" Margin="0,0,10,0" Visibility="Collapsed" Click="BtnUpdateBadge_Click" ToolTip="A newer version of Nexrein Printer Monitor is available! Click to view update details." />
+                    <!-- Right: Service Status Pill + Start / Stop / Restart / Refresh Buttons + Theme + Caption -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <!-- Update Badge (Hidden unless update available) -->
+                        <Button x:Name="BtnUpdateBadge" Content="🚀 Update Available" Style="{StaticResource SuccessBtn}" Padding="8,4" Margin="0,0,8,0" Visibility="Collapsed" Click="BtnUpdateBadge_Click" />
 
-                    <!-- Service Live Badge -->
-                    <Border x:Name="ServiceBadgeBorder" Background="#064E3B" BorderBrush="#10B981" BorderThickness="1" CornerRadius="16" Padding="12,6" Margin="0,0,12,0" VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal">
-                            <Ellipse x:Name="ServiceDot" Width="8" Height="8" Fill="#10B981" Margin="0,0,6,0" VerticalAlignment="Center" />
-                            <TextBlock x:Name="TxtServiceBadge" Text="SERVICE RUNNING" FontWeight="Bold" FontSize="11" Foreground="#6EE7B7" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Border>
+                        <!-- Service Running Pill Badge -->
+                        <Border x:Name="ServiceBadgeBorder" Background="{DynamicResource ServiceBadgeBg}" BorderBrush="{DynamicResource ServiceBadgeBorder}" BorderThickness="1" CornerRadius="12" Padding="10,5" Margin="0,0,10,0" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Ellipse x:Name="ServiceDot" Width="7" Height="7" Fill="#10B981" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                <TextBlock x:Name="TxtServiceBadge" Text="SERVICE RUNNING" FontWeight="Bold" FontSize="10" Foreground="{DynamicResource ServiceBadgeFg}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
 
-                    <!-- Theme Mode Selector (System / Dark / Light) -->
-                    <Border Background="{DynamicResource BgCardHover}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="8" Padding="4,2" Margin="0,0,10,0" VerticalAlignment="Center">
-                        <ComboBox x:Name="CmbThemeSelector" SelectionChanged="CmbThemeSelector_SelectionChanged" 
-                                  Background="Transparent" Foreground="{DynamicResource TextPrimary}" 
-                                  BorderThickness="0" Padding="6,4" MinWidth="130" FontSize="12" Cursor="Hand" ToolTip="Select UI Appearance: System Theme (Automatic), Modern Dark, or Modern Light">
-                            <ComboBoxItem Content="🖥️ System Theme" IsSelected="True" />
-                            <ComboBoxItem Content="🌙 Dark Mode" />
-                            <ComboBoxItem Content="☀️ Light Mode" />
-                        </ComboBox>
-                    </Border>
+                        <!-- Header Action Buttons -->
+                        <Button x:Name="BtnQuickStart" Content="Start" Style="{StaticResource HeaderActionBtn}" Margin="0,0,6,0" Click="BtnStartService_Click" ToolTip="Start Nexrein Printer Monitor Windows Service (Admin)" />
+                        <Button x:Name="BtnQuickStop" Content="Stop" Style="{StaticResource DangerStopBtn}" Margin="0,0,6,0" Click="BtnStopService_Click" ToolTip="Stop Nexrein Printer Monitor Windows Service (Requires Super Admin Password)" />
+                        <Button x:Name="BtnQuickRestart" Content="Restart" Style="{StaticResource HeaderActionBtn}" Margin="0,0,6,0" Click="BtnRestartService_Click" ToolTip="Restart Nexrein Printer Monitor Windows Service (Requires Super Admin Password)" />
+                        <Button x:Name="BtnRefreshAll" Content="Refresh" Style="{StaticResource SkyRefreshBtn}" Margin="0,0,12,0" Click="BtnRefreshAll_Click" ToolTip="Refresh Spooler metrics and jobs" />
 
-                    <!-- Protected Service Action Buttons -->
-                    <Button x:Name="BtnQuickStart" Content="▶ Start" Style="{StaticResource SuccessBtn}" Padding="10,6" Margin="0,0,6,0" Click="BtnStartService_Click" ToolTip="Start Nexrein Printer Monitor Windows Service (Admin)" />
-                    <Button x:Name="BtnQuickStop" Content="■ Stop" Style="{StaticResource DangerBtn}" Padding="10,6" Margin="0,0,6,0" Click="BtnStopService_Click" ToolTip="Stop Nexrein Printer Monitor Windows Service (Requires Super Admin Password)" />
-                    <Button x:Name="BtnQuickRestart" Content="🔄 Restart" Style="{StaticResource SecondaryBtn}" Padding="10,6" Margin="0,0,8,0" Click="BtnRestartService_Click" ToolTip="Restart Nexrein Printer Monitor Windows Service (Requires Super Admin Password)" />
+                        <!-- Theme Mode Switcher -->
+                        <Border Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="5" Padding="4,2" Margin="0,0,8,0" VerticalAlignment="Center">
+                            <ComboBox x:Name="CmbThemeSelector" SelectionChanged="CmbThemeSelector_SelectionChanged" 
+                                      Background="Transparent" Foreground="#E2E8F0" 
+                                      BorderThickness="0" Padding="4,2" MinWidth="110" FontSize="11" Cursor="Hand" ToolTip="Select Appearance Mode">
+                                <ComboBoxItem Content="🖥️ System" IsSelected="True" />
+                                <ComboBoxItem Content="🌙 Dark" />
+                                <ComboBoxItem Content="☀️ Light" />
+                            </ComboBox>
+                        </Border>
 
-                    <Button x:Name="BtnRefreshAll" Content="Refresh" Style="{StaticResource PrimaryBtn}" Padding="12,6" Click="BtnRefreshAll_Click" />
-
-                    <!-- Window Caption Control Separator -->
-                    <Border Width="1" Height="24" Background="{DynamicResource BorderColor}" Margin="12,0,10,0" />
-
-                    <!-- Window Caption Buttons (Minimize, Maximize / Restore, Close) -->
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button x:Name="BtnWinMinimize" Content="🗕" Style="{StaticResource CaptionBtn}" ToolTip="Minimize to Taskbar" Click="BtnWinMinimize_Click" />
-                        <Button x:Name="BtnWinMaximize" Content="🗖" Style="{StaticResource CaptionBtn}" ToolTip="Maximize / Restore Window" Click="BtnWinMaximize_Click" />
-                        <Button x:Name="BtnWinClose" Content="✕" Style="{StaticResource CaptionCloseBtn}" ToolTip="Close Application (Requires Super Admin Password)" Click="BtnWinClose_Click" />
+                        <!-- Window Caption Controls -->
+                        <Border Width="1" Height="20" Background="#334155" Margin="4,0,8,0" />
+                        <Button x:Name="BtnWinMinimize" Content="🗕" Style="{StaticResource CaptionBtn}" ToolTip="Minimize" Click="BtnWinMinimize_Click" />
+                        <Button x:Name="BtnWinMaximize" Content="🗖" Style="{StaticResource CaptionBtn}" ToolTip="Maximize / Restore" Click="BtnWinMaximize_Click" />
+                        <Button x:Name="BtnWinClose" Content="✕" Style="{StaticResource CaptionCloseBtn}" ToolTip="Close (Requires Password)" Click="BtnWinClose_Click" />
                     </StackPanel>
-                </StackPanel>
-            </Grid>
+                </Grid>
+
+                <!-- Row 2: Flat Underline Tabs Bar & Admin Identity -->
+                <Grid Margin="24,0,24,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Tab Headers Strip -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <Border x:Name="TabIndicator0" BorderThickness="0,0,0,2.5" BorderBrush="{DynamicResource TabActiveBorder}" Margin="0,0,18,0" Cursor="Hand" MouseDown="NavTab_MouseDown" Tag="0">
+                            <TextBlock x:Name="TabHeader0" Text="Dashboard" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TabActiveFg}" Padding="2,6,2,8" />
+                        </Border>
+                        <Border x:Name="TabIndicator1" BorderThickness="0,0,0,2.5" BorderBrush="Transparent" Margin="0,0,18,0" Cursor="Hand" MouseDown="NavTab_MouseDown" Tag="1">
+                            <TextBlock x:Name="TabHeader1" Text="Print Jobs &amp; Pages" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TabInactiveFg}" Padding="2,6,2,8" />
+                        </Border>
+                        <Border x:Name="TabIndicator2" BorderThickness="0,0,0,2.5" BorderBrush="Transparent" Margin="0,0,18,0" Cursor="Hand" MouseDown="NavTab_MouseDown" Tag="2">
+                            <TextBlock x:Name="TabHeader2" Text="Printers" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TabInactiveFg}" Padding="2,6,2,8" />
+                        </Border>
+                        <Border x:Name="TabIndicator3" BorderThickness="0,0,0,2.5" BorderBrush="Transparent" Margin="0,0,18,0" Cursor="Hand" MouseDown="NavTab_MouseDown" Tag="3">
+                            <TextBlock x:Name="TabHeader3" Text="API &amp; Security" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TabInactiveFg}" Padding="2,6,2,8" />
+                        </Border>
+                        <Border x:Name="TabIndicator4" BorderThickness="0,0,0,2.5" BorderBrush="Transparent" Margin="0,0,18,0" Cursor="Hand" MouseDown="NavTab_MouseDown" Tag="4">
+                            <TextBlock x:Name="TabHeader4" Text="Diagnostics" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TabInactiveFg}" Padding="2,6,2,8" />
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Right Admin Pill -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,4">
+                        <TextBlock x:Name="TxtAdminIdentity" Text="Super Admin • NEXREIN" FontSize="12" Foreground="#94A3B8" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
         </Border>
 
-        <!-- MAIN TABS -->
-        <TabControl x:Name="MainTabs" Grid.Row="1" Margin="24,14,24,14" SelectionChanged="MainTabs_SelectionChanged">
+        <!-- MAIN CONTENT TAB CONTROL (Hidden Headers, driven by custom nav strip) -->
+        <TabControl x:Name="MainTabs" Grid.Row="1" Margin="0" SelectionChanged="MainTabs_SelectionChanged">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </Style>
+            </TabControl.ItemContainerStyle>
 
-            <!-- TAB 1: OVERVIEW DASHBOARD -->
-            <TabItem Header="📊 Dashboard Overview">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="0,10,0,0">
-                        <!-- Hero Metric Cards (4 Columns) -->
-                        <Grid Margin="0,0,0,20">
+            <!-- TAB 0: DASHBOARD (EXACT LAYOUT OF REFERENCE IMAGES) -->
+            <TabItem>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24,18,24,18">
+                    <StackPanel>
+                        <!-- Section Toolbar Header: Title & Right Actions -->
+                        <Grid Margin="0,0,0,16">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="14" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Title -->
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock x:Name="TxtOverviewDate" Text="Print Accounting Overview · Today, 08 Oct 2026" FontSize="17" FontWeight="Bold" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" />
+                            </StackPanel>
+
+                            <!-- Right Controls: [Today ▾] [Simulate Print] [Export CSV] -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Border Background="{DynamicResource SectionBtnBg}" BorderBrush="{DynamicResource SectionBtnBorder}" BorderThickness="1" CornerRadius="5" Padding="2" Margin="0,0,8,0">
+                                    <ComboBox x:Name="CmbDashDateFilter" SelectionChanged="CmbDashDateFilter_SelectionChanged" 
+                                              Background="Transparent" Foreground="{DynamicResource SectionBtnFg}" 
+                                              BorderThickness="0" Padding="8,4" MinWidth="90" FontSize="12" Cursor="Hand">
+                                        <ComboBoxItem Content="Today ▾" IsSelected="True" />
+                                        <ComboBoxItem Content="Yesterday" />
+                                        <ComboBoxItem Content="Last 7 Days" />
+                                        <ComboBoxItem Content="This Month" />
+                                        <ComboBoxItem Content="All Time" />
+                                        <ComboBoxItem Content="Custom Range" />
+                                    </ComboBox>
+                                </Border>
+
+                                <StackPanel x:Name="PnlCustomDateRange" Orientation="Horizontal" Visibility="Collapsed" Margin="0,0,8,0" VerticalAlignment="Center">
+                                    <DatePicker x:Name="DpStartDate" Width="105" Margin="0,0,4,0" SelectedDateChanged="DpDate_SelectedDateChanged" />
+                                    <DatePicker x:Name="DpEndDate" Width="105" SelectedDateChanged="DpDate_SelectedDateChanged" />
+                                </StackPanel>
+
+                                <Button x:Name="BtnSimulatePrint" Content="Simulate Print" Style="{StaticResource SectionActionBtn}" Margin="0,0,8,0" Click="BtnSimulateJob_Click" ToolTip="Record test print job to verify accounting" />
+                                <Button x:Name="BtnExportCsv" Content="Export CSV" Style="{StaticResource SectionActionBtn}" Click="BtnExportDashCsv_Click" ToolTip="Export print activity to CSV" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- 6 KPI METRIC CARDS ROW (Matching Image 1 & 2 exactly) -->
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="14" />
+                                <ColumnDefinition Width="12" />
                                 <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="14" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="12" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
 
-                            <!-- Card 1: Today's Pages Printed (Daily Tracking) -->
-                            <Border Grid.Column="0" Style="{StaticResource MetricCard}" BorderBrush="{DynamicResource AccentPrimary}">
+                            <!-- CARD 1: TOTAL PAGES -->
+                            <Border Grid.Column="0" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="14,12" Height="105">
                                 <StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                        <TextBlock Text="📅" FontSize="16" Margin="0,0,8,0" />
-                                        <TextBlock Text="TODAY'S PAGES PRINTED" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource AccentPrimary}" />
-                                    </StackPanel>
-                                    <TextBlock x:Name="TxtTodayPages" Text="0" FontSize="34" FontWeight="Bold" Foreground="{DynamicResource AccentPrimary}" Margin="0,0,0,4" />
-                                    <TextBlock x:Name="TxtTodayBreakdown" Text="0 B&amp;W / Gray • 0 Color" FontSize="12" Foreground="{DynamicResource TextSecondary}" />
+                                    <Border Height="3" Background="#2563EB" CornerRadius="2" Margin="0,-12,0,10" HorizontalAlignment="Stretch" />
+                                    <TextBlock Text="TOTAL PAGES" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,6" />
+                                    <TextBlock x:Name="TxtTodayPages" Text="2" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource KpiVal1}" Margin="0,0,0,4" />
+                                    <TextBlock x:Name="TxtTotalPagesSub" Text="All printers" FontSize="11" Foreground="{DynamicResource TextSecondary}" />
                                 </StackPanel>
                             </Border>
 
-                            <!-- Card 2: Lifetime Total Pages Printed -->
-                            <Border Grid.Column="2" Style="{StaticResource MetricCard}">
+                            <!-- CARD 2: COLOR PAGES -->
+                            <Border Grid.Column="2" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="14,12" Height="105">
                                 <StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                        <TextBlock Text="📄" FontSize="16" Margin="0,0,8,0" />
-                                        <TextBlock Text="LIFETIME PAGES PRINTED" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMuted}" />
-                                    </StackPanel>
-                                    <TextBlock x:Name="TxtTotalPages" Text="0" FontSize="34" FontWeight="Bold" Foreground="{DynamicResource AccentSuccess}" Margin="0,0,0,4" />
-                                    <TextBlock x:Name="TxtPagesSub" Text="0 B&amp;W / Gray • 0 Color" FontSize="12" Foreground="{DynamicResource TextSecondary}" />
+                                    <Border Height="3" Background="#06B6D4" CornerRadius="2" Margin="0,-12,0,10" HorizontalAlignment="Stretch" />
+                                    <TextBlock Text="COLOR PAGES" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,6" />
+                                    <TextBlock x:Name="TxtColorPagesVal" Text="2" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource KpiVal2}" Margin="0,0,0,4" />
+                                    <TextBlock x:Name="TxtColorPagesSub" Text="100% of output" FontSize="11" Foreground="{DynamicResource TextSecondary}" />
                                 </StackPanel>
                             </Border>
 
-                            <!-- Card 3: Installed Printers -->
-                            <Border Grid.Column="4" Style="{StaticResource MetricCard}">
+                            <!-- CARD 3: B&W PAGES -->
+                            <Border Grid.Column="4" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="14,12" Height="105">
                                 <StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                        <TextBlock Text="🖨️" FontSize="16" Margin="0,0,8,0" />
-                                        <TextBlock Text="INSTALLED PRINTERS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMuted}" />
-                                    </StackPanel>
-                                    <TextBlock x:Name="TxtPrintersCount" Text="0" FontSize="34" FontWeight="Bold" Foreground="#A855F7" Margin="0,0,0,4" />
-                                    <TextBlock x:Name="TxtPrintersSub" Text="Active Win32 Spooler devices" FontSize="12" Foreground="{DynamicResource TextSecondary}" />
+                                    <Border Height="3" Background="#64748B" CornerRadius="2" Margin="0,-12,0,10" HorizontalAlignment="Stretch" />
+                                    <TextBlock Text="B&amp;W PAGES" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,6" />
+                                    <TextBlock x:Name="TxtMonoPagesVal" Text="0" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource KpiVal3}" Margin="0,0,0,4" />
+                                    <TextBlock x:Name="TxtMonoPagesSub" Text="0% of output" FontSize="11" Foreground="{DynamicResource TextSecondary}" />
                                 </StackPanel>
                             </Border>
 
-                            <!-- Card 4: Print Jobs & Cloud Sync -->
-                            <Border Grid.Column="6" Style="{StaticResource MetricCard}">
+                            <!-- CARD 4: PRINT JOBS -->
+                            <Border Grid.Column="6" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="14,12" Height="105">
                                 <StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                        <TextBlock Text="☁️" FontSize="16" Margin="0,0,8,0" />
-                                        <TextBlock Text="TOTAL JOBS &amp; SYNC" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMuted}" />
-                                    </StackPanel>
-                                    <TextBlock x:Name="TxtTotalJobs" Text="0" FontSize="34" FontWeight="Bold" Foreground="#EC4899" Margin="0,0,0,4" />
-                                    <TextBlock x:Name="TxtJobsSub" Text="0 Pending cloud sync" FontSize="12" Foreground="{DynamicResource TextSecondary}" />
+                                    <Border Height="3" Background="#A855F7" CornerRadius="2" Margin="0,-12,0,10" HorizontalAlignment="Stretch" />
+                                    <TextBlock Text="PRINT JOBS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,6" />
+                                    <TextBlock x:Name="TxtTodayJobsVal" Text="2" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource KpiVal4}" Margin="0,0,0,4" />
+                                    <TextBlock x:Name="TxtJobsSub" Text="Recorded today" FontSize="11" Foreground="{DynamicResource TextSecondary}" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- CARD 5: SUCCESS RATE -->
+                            <Border Grid.Column="8" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="14,12" Height="105">
+                                <StackPanel>
+                                    <Border Height="3" Background="#10B981" CornerRadius="2" Margin="0,-12,0,10" HorizontalAlignment="Stretch" />
+                                    <TextBlock Text="SUCCESS RATE" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,6" />
+                                    <TextBlock x:Name="TxtSuccessRateVal" Text="100%" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource KpiVal5}" Margin="0,0,0,4" />
+                                    <TextBlock x:Name="TxtFailedJobsSub" Text="0 failed jobs" FontSize="11" Foreground="{DynamicResource TextSecondary}" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- CARD 6: AVG PAGES / JOB -->
+                            <Border Grid.Column="10" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="14,12" Height="105">
+                                <StackPanel>
+                                    <Border Height="3" Background="#F97316" CornerRadius="2" Margin="0,-12,0,10" HorizontalAlignment="Stretch" />
+                                    <TextBlock Text="AVG PAGES / JOB" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,6" />
+                                    <TextBlock x:Name="TxtAvgPagesJobVal" Text="1.0" FontSize="26" FontWeight="Bold" Foreground="{DynamicResource KpiVal6}" Margin="0,0,0,4" />
+                                    <TextBlock x:Name="TxtPrintersOnlineSub" Text="1 printer online" FontSize="11" Foreground="{DynamicResource TextSecondary}" />
                                 </StackPanel>
                             </Border>
                         </Grid>
 
-                        <!-- Today's Live Color vs Grayscale Meter -->
-                        <Border Style="{StaticResource MetricCard}" Margin="0,0,0,20">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,10">
-                                    <TextBlock Text="Daily Color vs. Black &amp; White / Grayscale Accounting" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextPrimary}" />
-                                    <TextBlock x:Name="TxtTodayRatio" Text="Today: 0 Total Pages" HorizontalAlignment="Right" Foreground="{DynamicResource TextSecondary}" FontSize="12" />
-                                </Grid>
-                                <!-- Progress representation -->
-                                <Grid Height="14" Margin="0,0,0,10">
-                                    <Border CornerRadius="7" Background="{DynamicResource BorderColor}" />
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition x:Name="ColColorBar" Width="50*" />
-                                            <ColumnDefinition x:Name="ColMonoBar" Width="50*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Border Grid.Column="0" Background="#A855F7" CornerRadius="7,0,0,7" />
-                                        <Border Grid.Column="1" Background="#0284C7" CornerRadius="0,7,7,0" />
-                                    </Grid>
-                                </Grid>
+                        <!-- MIDDLE ROW: 3 CARDS (Color vs. B&W Donut, Pages by Hour Bar Chart, Printers List) -->
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="14" />
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="14" />
+                                <ColumnDefinition Width="1.1*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- CARD 1: Color vs. B&W (Donut Chart) -->
+                            <Border Grid.Column="0" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="18,16" Height="190">
                                 <Grid>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Border Width="12" Height="12" Background="#A855F7" CornerRadius="3" Margin="0,0,6,0" VerticalAlignment="Center" />
-                                        <TextBlock x:Name="TxtColorLegend" Text="🎨 Color Pages: 0" FontSize="12" Foreground="#D8B4FE" Margin="0,0,24,0" />
-                                        <Border Width="12" Height="12" Background="#0284C7" CornerRadius="3" Margin="0,0,6,0" VerticalAlignment="Center" />
-                                        <TextBlock x:Name="TxtMonoLegend" Text="🔲 Black &amp; White / Grayscale: 0" FontSize="12" Foreground="#7DD3FC" />
-                                    </StackPanel>
-                                    <TextBlock Text="Live real-time updates via Windows Spooler event listener" HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource TextMuted}" />
-                                </Grid>
-                            </StackPanel>
-                        </Border>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="Color vs. B&amp;W" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,10" />
 
-                        <!-- DASHBOARD PRINT ACTIVITY & DATE FILTERING SECTION -->
-                        <Border Style="{StaticResource MetricCard}" Margin="0,0,0,20" BorderBrush="{DynamicResource AccentPrimary}">
-                            <StackPanel>
-                                <!-- Header & Date Filter Toolbar -->
-                                <Grid Margin="0,0,0,14">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-
-                                    <!-- Title & Description -->
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
-                                            <TextBlock Text="📄 Live Print Activity &amp; Date Filtered Data" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextPrimary}" />
-                                            <Border Background="{DynamicResource LockBadgeBg}" BorderBrush="{DynamicResource AccentPrimary}" BorderThickness="1" CornerRadius="10" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
-                                                <TextBlock x:Name="TxtDashDateBadge" Text="Today's Prints" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource LockBadgeFg}" />
-                                            </Border>
-                                        </StackPanel>
-                                        <TextBlock Text="Filter prints by date, review document types, page usage, and real-time spooler accounting." FontSize="12" Foreground="{DynamicResource TextSecondary}" />
-                                    </StackPanel>
-
-                                    <!-- Date Filtering Controls -->
-                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                        <!-- Quick Date Filter Presets -->
-                                        <TextBlock Text="📅 Date:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{DynamicResource TextSecondary}" FontWeight="SemiBold" />
-                                        <ComboBox x:Name="CmbDashDateFilter" SelectionChanged="CmbDashDateFilter_SelectionChanged" Background="{DynamicResource BgInput}" Foreground="{DynamicResource TextPrimary}" Padding="10,6" Margin="0,0,10,0" MinWidth="135">
-                                            <ComboBoxItem Content="Today" IsSelected="True" />
-                                            <ComboBoxItem Content="Yesterday" />
-                                            <ComboBoxItem Content="Last 7 Days" />
-                                            <ComboBoxItem Content="This Month" />
-                                            <ComboBoxItem Content="All Time" />
-                                            <ComboBoxItem Content="Custom Range" />
-                                        </ComboBox>
-
-                                        <!-- Custom DatePickers -->
-                                        <StackPanel x:Name="PnlCustomDateRange" Orientation="Horizontal" Visibility="Collapsed" Margin="0,0,10,0" VerticalAlignment="Center">
-                                            <TextBlock Text="From:" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="{DynamicResource TextMuted}" FontSize="11" />
-                                            <DatePicker x:Name="DpStartDate" Width="110" Margin="0,0,6,0" SelectedDateChanged="DpDate_SelectedDateChanged" />
-                                            <TextBlock Text="To:" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="{DynamicResource TextMuted}" FontSize="11" />
-                                            <DatePicker x:Name="DpEndDate" Width="110" SelectedDateChanged="DpDate_SelectedDateChanged" />
-                                        </StackPanel>
-
-                                        <!-- Actions -->
-                                        <Button Content="Simulate Print" Style="{StaticResource SecondaryBtn}" Padding="10,6" Margin="0,0,8,0" Click="BtnSimulateJob_Click" ToolTip="Record a test print job to verify accounting" />
-                                        <Button Content="Export CSV" Style="{StaticResource SecondaryBtn}" Padding="10,6" Margin="0,0,8,0" Click="BtnExportDashCsv_Click" ToolTip="Export current date filtered prints to CSV" />
-                                        <Button Content="🔄 Refresh" Style="{StaticResource PrimaryBtn}" Padding="10,6" Click="BtnRefreshDash_Click" />
-                                    </StackPanel>
-                                </Grid>
-
-                                <!-- Date Filter Summary KPI Strip -->
-                                <Border Background="{DynamicResource BgInput}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="8" Padding="16,10" Margin="0,0,0,14">
-                                    <Grid>
+                                    <Grid Grid.Row="1">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="110" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-                                        <StackPanel Grid.Column="0">
-                                            <TextBlock Text="ACTIVE DATE PERIOD" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,3" />
-                                            <TextBlock x:Name="TxtDashKpiPeriod" Text="Today" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource AccentInfo}" />
-                                        </StackPanel>
+                                        <!-- Circular Ring / Donut representation -->
+                                        <Grid Grid.Column="0" Width="92" Height="92" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Ellipse Width="92" Height="92" Stroke="#64748B" StrokeThickness="11" Opacity="0.45" />
+                                            <Ellipse x:Name="DonutFullRing" Width="92" Height="92" Stroke="#06B6D4" StrokeThickness="11" Visibility="Collapsed" />
+                                            <Path x:Name="DonutColorArc" Stroke="#06B6D4" StrokeThickness="11" Width="92" Height="92" />
+                                            <TextBlock x:Name="TxtDonutPercent" Text="100%" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextPrimary}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
 
-                                        <StackPanel Grid.Column="1">
-                                            <TextBlock Text="TOTAL PAGES IN PERIOD" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,3" />
-                                            <TextBlock x:Name="TxtDashKpiPages" Text="0 Pages" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource AccentSuccess}" />
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Column="2">
-                                            <TextBlock Text="COLOR VS. B&amp;W PAGES" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,3" />
-                                            <TextBlock x:Name="TxtDashKpiBreakdown" Text="0 Color • 0 B&amp;W" FontSize="14" FontWeight="SemiBold" Foreground="#A855F7" />
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Column="3">
-                                            <TextBlock Text="PRINT JOBS RECORDED" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,3" />
-                                            <TextBlock x:Name="TxtDashKpiJobs" Text="0 Jobs" FontSize="14" FontWeight="Bold" Foreground="#EC4899" />
+                                        <!-- Legend -->
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="14,0,0,0">
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                                <Border Width="9" Height="9" Background="#06B6D4" CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                                <TextBlock x:Name="TxtDonutColorText" Text="Color · 2 pages" FontSize="12" Foreground="{DynamicResource TextPrimary}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Border Width="9" Height="9" Background="#64748B" CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                                <TextBlock x:Name="TxtDonutMonoText" Text="B&amp;W · 0 pages" FontSize="12" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                            </StackPanel>
                                         </StackPanel>
                                     </Grid>
-                                </Border>
+                                </Grid>
+                            </Border>
 
-                                <!-- Dashboard Prints DataGrid -->
-                                <DataGrid x:Name="DgDashboardJobs" MaxHeight="270" Margin="0,0,0,10">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Submitted (Local)" Binding="{Binding SubmittedAtLocal}" Width="135" />
-                                        <DataGridTemplateColumn Header="Document Type" Width="145">
-                                            <DataGridTemplateColumn.CellTemplate>
+                            <!-- CARD 2: Pages by hour (Vertical Column Bar Chart) -->
+                            <Border Grid.Column="2" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="18,16" Height="190">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Header with Today indicator -->
+                                    <Grid Grid.Row="0" Margin="0,0,0,8">
+                                        <TextBlock Text="Pages by hour" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" />
+                                        <TextBlock Text="Today" FontSize="11" Foreground="{DynamicResource TextSecondary}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                    </Grid>
+
+                                    <!-- Hourly Bars (generated from live data) -->
+                                    <Grid Grid.Row="1" VerticalAlignment="Bottom" Height="95" Margin="4,0,4,0">
+                                        <Border VerticalAlignment="Bottom" Height="1" Background="{DynamicResource BorderColor}" />
+                                        <Grid x:Name="GridHourBars" />
+                                    </Grid>
+
+                                    <!-- Bottom Hour Labels -->
+                                    <Grid Grid.Row="2" x:Name="GridHourLabels" Margin="4,4,4,0" />
+                                </Grid>
+                            </Border>
+
+                            <!-- CARD 3: Printers List & Spooler Listener State -->
+                            <Border Grid.Column="4" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="18,16" Height="190">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="1" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Text="Printers" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,16" />
+
+                                    <!-- Printer Items (live) -->
+                                    <ScrollViewer Grid.Row="1" MaxHeight="78" VerticalScrollBarVisibility="Auto" Margin="0,0,0,10">
+                                        <ItemsControl x:Name="IcDashPrinters">
+                                            <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                                        <TextBlock Text="{Binding DocumentTypeIcon}" FontSize="14" Margin="0,0,6,0" VerticalAlignment="Center" />
-                                                        <TextBlock Text="{Binding DocumentTypeName}" FontSize="12" Foreground="{DynamicResource TextPrimary}" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                                    </StackPanel>
+                                                    <Grid Margin="0,0,0,8">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                                        <TextBlock Grid.Column="1" Text="{Binding PagesDisplay}" FontFamily="Consolas" FontSize="12" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" Margin="10,0,14,0" />
+                                                        <Border Grid.Column="2" Background="{DynamicResource BadgeCompletedBg}" BorderBrush="{DynamicResource BadgeCompletedBorder}" BorderThickness="1" CornerRadius="10" Padding="8,2" VerticalAlignment="Center">
+                                                            <TextBlock Text="{Binding StatusDisplay}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BadgeCompletedFg}" />
+                                                        </Border>
+                                                    </Grid>
                                                 </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Document Name" Binding="{Binding DocumentName}" Width="220" />
-                                        <DataGridTextColumn Header="User" Binding="{Binding Username}" Width="100" />
-                                        <DataGridTextColumn Header="Printer" Binding="{Binding PrinterName}" Width="160" />
-                                        <DataGridTextColumn Header="Pages" Binding="{Binding Pages}" Width="60" />
-                                        <DataGridTextColumn Header="Copies" Binding="{Binding Copies}" Width="60" />
-                                        <DataGridTextColumn Header="Total Pages" Binding="{Binding TotalPagesCalculated}" Width="85" />
-                                        <DataGridTemplateColumn Header="Color / B&amp;W" Width="110">
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+
+                                    <!-- Divider -->
+                                    <Border Grid.Row="2" Background="{DynamicResource BorderColor}" Margin="0,0,0,12" />
+
+                                    <!-- Footer info -->
+                                    <TextBlock Grid.Row="3" Text="Spooler event listener active · live updates" FontSize="11" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                        <!-- LIVE PRINT ACTIVITY TABLE CARD -->
+                        <Border Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="18,16">
+                            <StackPanel>
+                                <!-- Header & Job Counter -->
+                                <Grid Margin="0,0,0,14">
+                                    <TextBlock Text="Live Print Activity" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="TxtLiveActivityCount" Text="2 jobs · 2 pages" FontSize="12" Foreground="{DynamicResource TextSecondary}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                </Grid>
+
+                                <!-- Live DataGrid -->
+                                <DataGrid x:Name="DgDashboardJobs" MaxHeight="320" Margin="0,0,0,4">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="SUBMITTED" Binding="{Binding SubmittedAtLocal}" Width="150" />
+                                        <DataGridTextColumn Header="TYPE" Binding="{Binding DocumentTypeName}" Width="130" />
+                                        <DataGridTextColumn Header="DOCUMENT" Binding="{Binding DocumentName}" Width="260" />
+                                        <DataGridTextColumn Header="USER" Binding="{Binding Username}" Width="100" />
+                                        <DataGridTextColumn Header="PRINTER" Binding="{Binding PrinterName}" Width="170" />
+                                        <DataGridTextColumn Header="PAGES" Binding="{Binding TotalPagesCalculated}" Width="75" />
+                                        <DataGridTemplateColumn Header="MODE" Width="95">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Border Background="{Binding ColorBadgeBg}" CornerRadius="10" Padding="8,3" HorizontalAlignment="Left" VerticalAlignment="Center">
-                                                        <TextBlock Text="{Binding ColorModeDisplay}" FontSize="11" FontWeight="Bold" Foreground="{Binding ColorBadgeFg}" />
+                                                    <Border Background="{Binding ColorBadgeBg}" CornerRadius="4" Padding="8,2" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding ModeBadgeText}" FontSize="10" FontWeight="Bold" Foreground="{Binding ColorBadgeFg}" />
                                                     </Border>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="90" />
+                                        <DataGridTemplateColumn Header="STATUS" Width="105">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <Border Background="{DynamicResource BadgeCompletedBg}" BorderBrush="{DynamicResource BadgeCompletedBorder}" BorderThickness="1" CornerRadius="10" Padding="8,2" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding StatusBadgeText}" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource BadgeCompletedFg}" />
+                                                    </Border>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
                                     </DataGrid.Columns>
                                 </DataGrid>
-
-                                <!-- Footer / Navigation Link -->
-                                <Grid>
-                                    <TextBlock x:Name="TxtDashTableFooter" Text="Showing 0 print jobs for selected date range" FontSize="12" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
-                                    <Button Content="View Extended Print History &amp; Advanced Filters ➔" Style="{StaticResource SecondaryBtn}" Padding="10,4" HorizontalAlignment="Right" Click="BtnGoToHistoryTab_Click" />
-                                </Grid>
                             </StackPanel>
                         </Border>
-
-                        <!-- Windows Service & Machine Configuration -->
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1.2*" />
-                                <ColumnDefinition Width="16" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <!-- Service State & Autostart Card -->
-                            <Border Grid.Column="0" Style="{StaticResource MetricCard}">
-                                <StackPanel>
-                                    <TextBlock Text="Windows Service State &amp; Boot Persistence" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,14" />
-                                    <Grid Margin="0,0,0,8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="170" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="Service Name:" Foreground="{DynamicResource TextMuted}" />
-                                        <TextBlock Grid.Column="1" Text="PrintMonitor" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" />
-                                    </Grid>
-                                    <Grid Margin="0,0,0,8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="170" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="Current Status:" Foreground="{DynamicResource TextMuted}" />
-                                        <TextBlock Grid.Column="1" x:Name="TxtServiceDetailStatus" Text="Running" FontWeight="Bold" Foreground="{DynamicResource AccentSuccess}" />
-                                    </Grid>
-                                    <Grid Margin="0,0,0,8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="170" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="Service Boot Startup:" Foreground="{DynamicResource TextMuted}" />
-                                        <TextBlock Grid.Column="1" Text="Automatic (Survives Windows Restart)" Foreground="{DynamicResource AccentInfo}" FontWeight="SemiBold" />
-                                    </Grid>
-                                    <Grid Margin="0,0,0,8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="170" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="GUI Manager Autostart:" Foreground="{DynamicResource TextMuted}" />
-                                        <CheckBox Grid.Column="1" x:Name="ChkAutostartOnBoot" Content="Launch Control Panel on Windows User Login" Foreground="{DynamicResource TextPrimary}" Click="ChkAutostartOnBoot_Click" />
-                                    </Grid>
-                                    <Grid Margin="0,0,0,16">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="170" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="Crash Recovery:" Foreground="{DynamicResource TextMuted}" />
-                                        <TextBlock Grid.Column="1" Text="Auto-restart after 60s (reset= 86400)" Foreground="{DynamicResource TextSecondary}" />
-                                    </Grid>
-
-                                    <!-- Service Control Buttons -->
-                                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                                        <Button Content="▶ Start Service" Style="{StaticResource SuccessBtn}" Margin="0,0,10,0" Click="BtnStartService_Click" />
-                                        <Button Content="■ Stop Service" Style="{StaticResource DangerBtn}" Margin="0,0,10,0" Click="BtnStopService_Click" ToolTip="Requires Super Admin Password" />
-                                        <Button Content="🔄 Restart Service" Style="{StaticResource SecondaryBtn}" Click="BtnRestartService_Click" ToolTip="Requires Super Admin Password" />
-                                    </StackPanel>
-                                </StackPanel>
-                            </Border>
-
-                            <!-- Machine & Storage Diagnostics Card -->
-                            <Border Grid.Column="2" Style="{StaticResource MetricCard}">
-                                <StackPanel>
-                                    <TextBlock Text="System Architecture &amp; Storage" FontWeight="Bold" FontSize="15" Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,14" />
-                                    <Grid Margin="0,0,0,8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="140" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="Workstation Host:" Foreground="{DynamicResource TextMuted}" />
-                                        <TextBlock Grid.Column="1" x:Name="TxtMachineName" Text="Loading..." FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" />
-                                    </Grid>
-                                    <Grid Margin="0,0,0,8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="140" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="Device GUID:" Foreground="{DynamicResource TextMuted}" />
-                                        <TextBlock Grid.Column="1" x:Name="TxtDeviceId" Text="Loading..." FontSize="11" Foreground="{DynamicResource TextSecondary}" TextTrimming="CharacterEllipsis" />
-                                    </Grid>
-                                    <Grid Margin="0,0,0,8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="140" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="Local Storage:" Foreground="{DynamicResource TextMuted}" />
-                                        <TextBlock Grid.Column="1" x:Name="TxtDbSize" Text="72 KB (WAL Mode)" Foreground="{DynamicResource AccentInfo}" />
-                                    </Grid>
-                                    <Grid Margin="0,0,0,14">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="140" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="Suite Version:" Foreground="{DynamicResource TextMuted}" />
-                                        <TextBlock Grid.Column="1" Text="2.0.0 (win-x64 Enterprise)" Foreground="#EC4899" FontWeight="SemiBold" />
-                                    </Grid>
-
-                                    <Button Content="📂 Open Data Directory" Style="{StaticResource SecondaryBtn}" HorizontalAlignment="Left" Click="BtnOpenDataDir_Click" />
-                                </StackPanel>
-                            </Border>
-                        </Grid>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
-            <!-- TAB 2: PRINTED PAGES & PRINT JOBS -->
-            <TabItem Header="📄 Print Jobs &amp; Pages">
-                <Grid Margin="0,10,0,0">
+            <!-- TAB 1: EXTENDED PRINT HISTORY & SEARCH -->
+            <TabItem>
+                <Grid Margin="24,18,24,18">
                     <Grid.RowDefinitions>
-                        <!-- Filters Bar -->
                         <RowDefinition Height="Auto" />
-                        <!-- DataGrid -->
                         <RowDefinition Height="*" />
-                        <!-- Footer Stats Bar -->
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <!-- Filter Toolbar -->
-                    <Border Grid.Row="0" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,12">
+                    <!-- Filter Bar -->
+                    <Border Grid.Row="0" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="14,10" Margin="0,0,0,12">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -708,40 +775,26 @@
                                 <ComboBoxItem Content="Pending" />
                             </ComboBox>
 
-                            <!-- Actions -->
                             <StackPanel Grid.Column="9" Orientation="Horizontal">
-                                <Button Content="Simulate Test Job" Style="{StaticResource SecondaryBtn}" Margin="0,0,10,0" Click="BtnSimulateJob_Click" />
-                                <Button Content="Export CSV" Style="{StaticResource SecondaryBtn}" Margin="0,0,10,0" Click="BtnExportCsv_Click" />
-                                <Button Content="🔄 Refresh" Style="{StaticResource PrimaryBtn}" Click="BtnRefreshJobs_Click" />
+                                <Button Content="Simulate Test Job" Style="{StaticResource SectionActionBtn}" Margin="0,0,8,0" Click="BtnSimulateJob_Click" />
+                                <Button Content="Export CSV" Style="{StaticResource SectionActionBtn}" Margin="0,0,8,0" Click="BtnExportCsv_Click" />
+                                <Button Content="Refresh" Style="{StaticResource PrimaryBtn}" Click="BtnRefreshJobs_Click" />
                             </StackPanel>
                         </Grid>
                     </Border>
 
-                    <!-- DataGrid with Document Type, Name, Color/B&W, Pages -->
+                    <!-- Detailed DataGrid -->
                     <DataGrid Grid.Row="1" x:Name="DgJobs" Margin="0,0,0,8">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Submitted (Local)" Binding="{Binding SubmittedAtLocal}" Width="135" />
-                            <!-- Document Type Icon & Name -->
-                            <DataGridTemplateColumn Header="Document Type" Width="150">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding DocumentTypeIcon}" FontSize="14" Margin="0,0,6,0" VerticalAlignment="Center" />
-                                            <TextBlock Text="{Binding DocumentTypeName}" FontSize="12" Foreground="{DynamicResource TextPrimary}" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-
-                            <DataGridTextColumn Header="Document Name" Binding="{Binding DocumentName}" Width="210" />
-                            <DataGridTextColumn Header="User" Binding="{Binding Username}" Width="100" />
-                            <DataGridTextColumn Header="Printer Name" Binding="{Binding PrinterName}" Width="160" />
-                            <DataGridTextColumn Header="Pages" Binding="{Binding Pages}" Width="60" />
-                            <DataGridTextColumn Header="Copies" Binding="{Binding Copies}" Width="60" />
-                            <DataGridTextColumn Header="Total Pages" Binding="{Binding TotalPagesCalculated}" Width="80" />
-
-                            <!-- Color / Grayscale Badge -->
-                            <DataGridTemplateColumn Header="Color / B&amp;W" Width="110">
+                            <DataGridTextColumn Header="SUBMITTED" Binding="{Binding SubmittedAtLocal}" Width="140" />
+                            <DataGridTextColumn Header="TYPE" Binding="{Binding DocumentTypeName}" Width="130" />
+                            <DataGridTextColumn Header="DOCUMENT NAME" Binding="{Binding DocumentName}" Width="240" />
+                            <DataGridTextColumn Header="USER" Binding="{Binding Username}" Width="100" />
+                            <DataGridTextColumn Header="PRINTER" Binding="{Binding PrinterName}" Width="160" />
+                            <DataGridTextColumn Header="PAGES" Binding="{Binding Pages}" Width="60" />
+                            <DataGridTextColumn Header="COPIES" Binding="{Binding Copies}" Width="60" />
+                            <DataGridTextColumn Header="TOTAL" Binding="{Binding TotalPagesCalculated}" Width="70" />
+                            <DataGridTemplateColumn Header="COLOR / B&amp;W" Width="110">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border Background="{Binding ColorBadgeBg}" CornerRadius="10" Padding="8,3" HorizontalAlignment="Left" VerticalAlignment="Center">
@@ -750,41 +803,39 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-
-                            <DataGridTextColumn Header="Duplex" Binding="{Binding Duplex}" Width="85" />
-                            <DataGridTextColumn Header="Paper Size" Binding="{Binding PaperSize}" Width="85" />
-                            <DataGridTextColumn Header="Job Status" Binding="{Binding Status}" Width="95" />
-                            <DataGridTextColumn Header="Cloud Sync" Binding="{Binding SyncStatus}" Width="85" />
+                            <DataGridTextColumn Header="PAPER" Binding="{Binding PaperSize}" Width="80" />
+                            <DataGridTextColumn Header="STATUS" Binding="{Binding Status}" Width="95" />
+                            <DataGridTextColumn Header="CLOUD SYNC" Binding="{Binding SyncStatus}" Width="90" />
                         </DataGrid.Columns>
                     </DataGrid>
 
                     <!-- Footer Summary -->
-                    <Border Grid.Row="2" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="12,8">
+                    <Border Grid.Row="2" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="5" Padding="12,8">
                         <Grid>
                             <TextBlock x:Name="TxtJobTableSummary" Text="Showing 0 jobs | Total Pages: 0" FontSize="12" Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" />
-                            <TextBlock Text="Automatic classification: DOCX, Publisher, PDF, Images, Excel, Test Pages" HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource TextMuted}" VerticalAlignment="Center" />
+                            <TextBlock Text="Live Win32 spooler hooks tracking print activities" HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource TextMuted}" VerticalAlignment="Center" />
                         </Grid>
                     </Border>
                 </Grid>
             </TabItem>
 
-            <!-- TAB 3: INSTALLED PRINTERS -->
-            <TabItem Header="🖨️ Installed Printers">
-                <Grid Margin="0,10,0,0">
+            <!-- TAB 2: INSTALLED PRINTERS -->
+            <TabItem>
+                <Grid Margin="24,18,24,18">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,12">
+                    <Border Grid.Row="0" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="14,10" Margin="0,0,0,12">
                         <Grid>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <TextBlock Text="Detected Windows Printers:" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextPrimary}" Margin="0,0,8,0" />
-                                <TextBlock x:Name="TxtPrinterCountHeader" Text="0 printers" Foreground="{DynamicResource AccentInfo}" FontWeight="SemiBold" FontSize="14" />
+                                <TextBlock x:Name="TxtPrinterCountHeader" Text="0 printers" Foreground="{DynamicResource AccentPrimary}" FontWeight="SemiBold" FontSize="14" />
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Button Content="⚙️ Windows Printers Settings" Style="{StaticResource SecondaryBtn}" Margin="0,0,10,0" Click="BtnOpenWindowsPrinters_Click" />
+                                <Button Content="⚙️ Windows Printers Settings" Style="{StaticResource SectionActionBtn}" Margin="0,0,10,0" Click="BtnOpenWindowsPrinters_Click" />
                                 <Button Content="🔄 Rescan Win32 Spooler" Style="{StaticResource PrimaryBtn}" Click="BtnRescanPrinters_Click" />
                             </StackPanel>
                         </Grid>
@@ -792,34 +843,33 @@
 
                     <DataGrid Grid.Row="1" x:Name="DgPrinters">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Printer Name" Binding="{Binding Name}" Width="230" />
-                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" />
-                            <DataGridTextColumn Header="Port" Binding="{Binding PortName}" Width="140" />
-                            <DataGridTextColumn Header="Driver" Binding="{Binding DriverName}" Width="210" />
-                            <DataGridTextColumn Header="Topology / Type" Binding="{Binding TopologyType}" Width="130" />
-                            <DataGridTextColumn Header="Default?" Binding="{Binding IsDefaultDisplay}" Width="85" />
-                            <DataGridTextColumn Header="Active Spooler Jobs" Binding="{Binding JobCount}" Width="130" />
-                            <DataGridTextColumn Header="Last Seen" Binding="{Binding LastSeenAtLocal}" Width="140" />
+                            <DataGridTextColumn Header="PRINTER NAME" Binding="{Binding Name}" Width="240" />
+                            <DataGridTextColumn Header="STATUS" Binding="{Binding Status}" Width="100" />
+                            <DataGridTextColumn Header="PORT" Binding="{Binding PortName}" Width="140" />
+                            <DataGridTextColumn Header="DRIVER" Binding="{Binding DriverName}" Width="220" />
+                            <DataGridTextColumn Header="TOPOLOGY / TYPE" Binding="{Binding TopologyType}" Width="130" />
+                            <DataGridTextColumn Header="DEFAULT?" Binding="{Binding IsDefaultDisplay}" Width="85" />
+                            <DataGridTextColumn Header="SPOOLER JOBS" Binding="{Binding JobCount}" Width="110" />
+                            <DataGridTextColumn Header="LAST SEEN" Binding="{Binding LastSeenAtLocal}" Width="140" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
             </TabItem>
 
-            <!-- TAB 4: API ENDPOINT & SUPER ADMIN SETTINGS -->
-            <TabItem Header="🌐 API &amp; Security Settings">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="0,10,0,0" MaxWidth="880" HorizontalAlignment="Left">
-
+            <!-- TAB 3: API & SECURITY SETTINGS -->
+            <TabItem>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24,18,24,18">
+                    <StackPanel MaxWidth="880" HorizontalAlignment="Left">
                         <!-- Main Endpoint Card -->
                         <Border Style="{StaticResource MetricCard}" Margin="0,0,0,16">
                             <StackPanel>
                                 <Grid Margin="0,0,0,14">
                                     <StackPanel>
-                                        <TextBlock Text="Remote Web Server &amp; API Endpoint" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,4" />
-                                        <TextBlock Text="Production cloud endpoint connection, account identity, and background synchronization intervals." FontSize="13" Foreground="{DynamicResource TextSecondary}" />
+                                        <TextBlock Text="Remote Cloud Server &amp; API Endpoint" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextPrimary}" Margin="0,0,4,0" />
+                                        <TextBlock Text="Official production cloud endpoint connection, account identity, and background sync intervals." FontSize="13" Foreground="{DynamicResource TextSecondary}" />
                                     </StackPanel>
-                                    <Border HorizontalAlignment="Right" Background="{DynamicResource LockBadgeBg}" BorderBrush="{DynamicResource AccentPrimary}" BorderThickness="1" CornerRadius="12" Padding="10,4" VerticalAlignment="Top">
-                                        <TextBlock Text="🔒 Changes require Super Admin Password" FontSize="11" Foreground="{DynamicResource LockBadgeFg}" />
+                                    <Border HorizontalAlignment="Right" Background="#1E293B" BorderBrush="#334155" BorderThickness="1" CornerRadius="12" Padding="10,4" VerticalAlignment="Top">
+                                        <TextBlock Text="🔒 Super Admin Protected" FontSize="11" Foreground="#94A3B8" />
                                     </Border>
                                 </Grid>
 
@@ -832,23 +882,13 @@
                                     </Grid.ColumnDefinitions>
 
                                     <StackPanel Grid.Column="0">
-                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                                            <TextBlock Text="Registered User Email Address:" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" />
-                                            <Border Background="{DynamicResource LockBadgeBg}" CornerRadius="8" Padding="6,2" Margin="6,0,0,0">
-                                                <TextBlock Text="🔑 Account Identity" FontSize="10" Foreground="{DynamicResource LockBadgeFg}" />
-                                            </Border>
-                                        </StackPanel>
+                                        <TextBlock Text="Registered User Email Address:" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,6" />
                                         <TextBox x:Name="TxtUserEmail" ToolTip="Email used to log in at https://printmonitor.nexreindigital.co.ke" />
                                         <TextBlock Text="Ties this computer's print metrics to your online account." FontSize="11" Foreground="{DynamicResource TextMuted}" Margin="2,4,0,0" />
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="2">
-                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                                            <TextBlock Text="Computer / Shop Name:" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" />
-                                            <Border Background="#064E3B" CornerRadius="8" Padding="6,2" Margin="6,0,0,0">
-                                                <TextBlock Text="📍 Fleet Station" FontSize="10" Foreground="#6EE7B7" />
-                                            </Border>
-                                        </StackPanel>
+                                        <TextBlock Text="Computer / Shop Name:" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,6" />
                                         <TextBox x:Name="TxtShopName" ToolTip="Identity of this workstation on the cloud dashboard" />
                                         <TextBlock Text="Identifies this workstation in multi-machine business reports." FontSize="11" Foreground="{DynamicResource TextMuted}" Margin="2,4,0,0" />
                                     </StackPanel>
@@ -857,26 +897,20 @@
                                 <!-- Cloud API Base URL - HARDCODED AND LOCKED -->
                                 <Grid Margin="0,0,0,16">
                                     <StackPanel>
-                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                                            <TextBlock Text="Cloud Server API URL:" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" />
-                                            <Border Background="{DynamicResource LockBadgeBg}" CornerRadius="10" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
-                                                <TextBlock Text="🔒 Locked - Official Production Cloud Endpoint" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource LockBadgeFg}" />
-                                            </Border>
-                                        </StackPanel>
+                                        <TextBlock Text="Cloud Server API URL:" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,6" />
                                         <TextBox x:Name="TxtApiBaseUrl" 
                                                  Text="https://printmonitor.nexreindigital.co.ke/api"
                                                  IsReadOnly="True" 
                                                  Focusable="False" 
                                                  Cursor="No" 
-                                                 Opacity="0.85"
-                                                 ToolTip="Managed centrally by Nexrein Digital Cloud. Synchronizes your printers with https://printmonitor.nexreindigital.co.ke" />
-                                        <TextBlock Text="The cloud API endpoint is permanently locked to ensure real-time reporting to https://printmonitor.nexreindigital.co.ke." FontSize="11" Foreground="{DynamicResource TextMuted}" Margin="2,4,0,0" />
+                                                 Opacity="0.85" />
+                                        <TextBlock Text="Locked to official endpoint https://printmonitor.nexreindigital.co.ke." FontSize="11" Foreground="{DynamicResource TextMuted}" Margin="2,4,0,0" />
                                     </StackPanel>
                                 </Grid>
 
                                 <!-- API Key / Device Token -->
                                 <TextBlock Text="API Key / Device Authentication Token (optional):" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,6" />
-                                <TextBox x:Name="TxtApiKey" Margin="0,0,16,16" />
+                                <TextBox x:Name="TxtApiKey" Margin="0,0,0,16" />
 
                                 <!-- Intervals in 2 Columns -->
                                 <Grid Margin="0,0,0,16">
@@ -923,19 +957,19 @@
 
                                 <!-- Actions Row -->
                                 <StackPanel Orientation="Horizontal">
-                                    <Button x:Name="BtnSaveSettings" Content="💾 Save Settings (Admin)" Style="{StaticResource SuccessBtn}" Margin="0,0,12,0" Click="BtnSaveSettings_Click" />
-                                    <Button x:Name="BtnTestApi" Content="🧪 Test Endpoint Connection" Style="{StaticResource PrimaryBtn}" Margin="0,0,12,0" Click="BtnTestApi_Click" />
-                                    <Button x:Name="BtnTriggerSync" Content="🔄 Trigger Sync Now" Style="{StaticResource SecondaryBtn}" Click="BtnTriggerSync_Click" />
-                                    <Button x:Name="BtnOpenOnlineDashboard" Content="🌐 Open Online Dashboard" Style="{StaticResource SecondaryBtn}" Margin="12,0,0,0" Click="BtnOpenOnlineDashboard_Click" ToolTip="Open https://printmonitor.nexreindigital.co.ke in default browser" />
+                                    <Button x:Name="BtnSaveSettings" Content="💾 Save Settings (Admin)" Style="{StaticResource SuccessBtn}" Margin="0,0,10,0" Click="BtnSaveSettings_Click" />
+                                    <Button x:Name="BtnTestApi" Content="🧪 Test Endpoint Connection" Style="{StaticResource PrimaryBtn}" Margin="0,0,10,0" Click="BtnTestApi_Click" />
+                                    <Button x:Name="BtnTriggerSync" Content="🔄 Trigger Sync Now" Style="{StaticResource SectionActionBtn}" Margin="0,0,10,0" Click="BtnTriggerSync_Click" />
+                                    <Button x:Name="BtnOpenOnlineDashboard" Content="🌐 Open Online Dashboard" Style="{StaticResource SectionActionBtn}" Click="BtnOpenOnlineDashboard_Click" />
                                 </StackPanel>
                             </StackPanel>
                         </Border>
 
-                        <!-- Super Admin Password & Security Management Card -->
-                        <Border Style="{StaticResource MetricCard}" Margin="0,0,0,16" BorderBrush="{DynamicResource AccentPrimary}">
+                        <!-- Super Admin Password Management Card -->
+                        <Border Style="{StaticResource MetricCard}" Margin="0,0,0,16">
                             <StackPanel>
-                                <TextBlock Text="🔐 Super Admin Security Credentials" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,6" />
-                                <TextBlock Text="A Super Admin password is required to change service configuration, modify autostart options, stop the Windows Service, or exit this application." FontSize="13" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,16" TextWrapping="Wrap" />
+                                <TextBlock Text="🔐 Super Admin Security Credentials" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextPrimary}" Margin="0,0,6,0" />
+                                <TextBlock Text="Super Admin password protects stopping the service, terminating this panel, or modifying secure settings." FontSize="13" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,14" />
 
                                 <Grid Margin="0,0,0,14">
                                     <Grid.ColumnDefinitions>
@@ -946,39 +980,34 @@
 
                                     <StackPanel Grid.Column="0">
                                         <TextBlock Text="New Super Admin Password:" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,6" />
-                                        <PasswordBox x:Name="PbNewAdminPassword" Background="{DynamicResource BgInput}" Foreground="{DynamicResource TextPrimary}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" Padding="10,8" FontSize="13" />
+                                        <PasswordBox x:Name="PbNewAdminPassword" Background="{DynamicResource BgInput}" Foreground="{DynamicResource TextPrimary}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" Padding="8,6" FontSize="13" />
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="2">
                                         <TextBlock Text="Confirm New Password:" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,6" />
-                                        <PasswordBox x:Name="PbConfirmAdminPassword" Background="{DynamicResource BgInput}" Foreground="{DynamicResource TextPrimary}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" Padding="10,8" FontSize="13" />
+                                        <PasswordBox x:Name="PbConfirmAdminPassword" Background="{DynamicResource BgInput}" Foreground="{DynamicResource TextPrimary}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" Padding="8,6" FontSize="13" />
                                     </StackPanel>
                                 </Grid>
 
-                                <StackPanel Orientation="Horizontal">
-                                    <Button Content="🔑 Update Super Admin Password" Style="{StaticResource PrimaryBtn}" Click="BtnUpdatePassword_Click" />
-                                </StackPanel>
+                                <Button Content="🔑 Update Super Admin Password" Style="{StaticResource PrimaryBtn}" HorizontalAlignment="Left" Click="BtnUpdatePassword_Click" />
                             </StackPanel>
                         </Border>
 
                         <!-- Live Endpoint Test Response Box -->
-                        <Border x:Name="BorderTestResult" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="8" Padding="16,14" Margin="0,0,0,16" Visibility="Collapsed">
+                        <Border x:Name="BorderTestResult" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="14,12" Margin="0,0,0,16" Visibility="Collapsed">
                             <StackPanel>
-                                <TextBlock Text="Endpoint Test Result:" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextPrimary}" Margin="0,0,8,0" />
-                                <TextBlock x:Name="TxtTestResultMsg" Text="Testing..." FontSize="13" Foreground="{DynamicResource AccentInfo}" TextWrapping="Wrap" />
+                                <TextBlock Text="Endpoint Test Result:" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextPrimary}" Margin="0,0,6,0" />
+                                <TextBlock x:Name="TxtTestResultMsg" Text="Testing..." FontSize="13" Foreground="{DynamicResource AccentPrimary}" TextWrapping="Wrap" />
                             </StackPanel>
                         </Border>
 
                         <!-- Software Version & Updates Center -->
-                        <Border Style="{StaticResource MetricCard}" Margin="0,0,0,16" BorderBrush="{DynamicResource AccentSuccess}">
+                        <Border Style="{StaticResource MetricCard}" Margin="0,0,0,16">
                             <StackPanel>
                                 <Grid Margin="0,0,0,12">
-                                    <StackPanel>
-                                        <TextBlock Text="🔄 Software Updates &amp; Version Control" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextPrimary}" Margin="0,0,4,0" />
-                                        <TextBlock Text="Check for official releases and download updates. Existing print databases and custom settings remain 100% intact across all upgrades." FontSize="13" Foreground="{DynamicResource TextSecondary}" TextWrapping="Wrap" />
-                                    </StackPanel>
-                                    <Border HorizontalAlignment="Right" Background="#064E3B" BorderBrush="#10B981" BorderThickness="1" CornerRadius="12" Padding="10,4" VerticalAlignment="Top">
-                                        <TextBlock x:Name="TxtVersionPill" Text="Installed: v2.0.0" FontSize="11" FontWeight="Bold" Foreground="#6EE7B7" />
+                                    <TextBlock Text="🔄 Software Updates &amp; Version Control" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource TextPrimary}" />
+                                    <Border HorizontalAlignment="Right" Background="{DynamicResource BadgeCompletedBg}" BorderBrush="{DynamicResource BadgeCompletedBorder}" BorderThickness="1" CornerRadius="12" Padding="10,4">
+                                        <TextBlock x:Name="TxtVersionPill" Text="Installed: v2.0.0" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource BadgeCompletedFg}" />
                                     </Border>
                                 </Grid>
 
@@ -989,57 +1018,101 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <Border Grid.Column="0" Background="{DynamicResource BgInput}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="8" Padding="14,10">
+                                    <Border Grid.Column="0" Background="{DynamicResource BgInput}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="12,10">
                                         <StackPanel>
-                                            <TextBlock Text="Installed Version:" FontSize="12" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,2" />
-                                            <TextBlock x:Name="TxtInstalledVer" Text="2.0.0 (win-x64 Enterprise)" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource TextPrimary}" />
+                                            <TextBlock Text="Installed Version:" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,2" />
+                                            <TextBlock x:Name="TxtInstalledVer" Text="2.0.0 (win-x64 Enterprise)" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource TextPrimary}" />
                                         </StackPanel>
                                     </Border>
 
-                                    <Border Grid.Column="2" Background="{DynamicResource BgInput}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="8" Padding="14,10">
+                                    <Border Grid.Column="2" Background="{DynamicResource BgInput}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="12,10">
                                         <StackPanel>
-                                            <TextBlock Text="Latest Remote Version:" FontSize="12" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,2" />
-                                            <TextBlock x:Name="TxtLatestVer" Text="Click Check for Updates" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource AccentInfo}" />
+                                            <TextBlock Text="Latest Remote Version:" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,2" />
+                                            <TextBlock x:Name="TxtLatestVer" Text="Click Check for Updates" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource AccentPrimary}" />
                                         </StackPanel>
                                     </Border>
                                 </Grid>
 
-                                <TextBlock x:Name="TxtUpdateStatusDetails" Text="Click 'Check for Updates' to verify against release servers and GitHub channels." FontSize="13" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,14" TextWrapping="Wrap" />
+                                <TextBlock x:Name="TxtUpdateStatusDetails" Text="Click 'Check for Updates' to verify against release servers and GitHub channels." FontSize="12" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,14" />
 
                                 <StackPanel Orientation="Horizontal">
-                                    <Button x:Name="BtnCheckUpdates" Content="🔍 Check for Updates Now" Style="{StaticResource PrimaryBtn}" Margin="0,0,12,0" Click="BtnCheckUpdates_Click" />
+                                    <Button x:Name="BtnCheckUpdates" Content="🔍 Check for Updates Now" Style="{StaticResource PrimaryBtn}" Margin="0,0,10,0" Click="BtnCheckUpdates_Click" />
                                     <Button x:Name="BtnDownloadUpdate" Content="⬇️ Download / Install Update" Style="{StaticResource SuccessBtn}" Visibility="Collapsed" Click="BtnDownloadUpdate_Click" />
                                 </StackPanel>
                             </StackPanel>
                         </Border>
-
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
-            <!-- TAB 5: LIVE DIAGNOSTIC LOGS -->
-            <TabItem Header="📝 Diagnostic Logs">
-                <Grid Margin="0,10,0,0">
+            <!-- TAB 4: DIAGNOSTICS & LOGS -->
+            <TabItem>
+                <Grid Margin="24,18,24,18">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,12">
+                    <StackPanel Grid.Row="0">
+                    <!-- Service & System Information -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="14" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Style="{StaticResource MetricCard}">
+                            <StackPanel>
+                                <TextBlock Text="Windows Service" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,10" />
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="Status" Foreground="{DynamicResource TextSecondary}" FontSize="12" />
+                                    <TextBlock x:Name="TxtServiceDetailStatus" Text="Running" HorizontalAlignment="Right" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource AccentSuccess}" />
+                                </Grid>
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="Startup" Foreground="{DynamicResource TextSecondary}" FontSize="12" />
+                                    <TextBlock Text="Automatic · auto-restart after 60s" HorizontalAlignment="Right" FontSize="12" Foreground="{DynamicResource TextPrimary}" />
+                                </Grid>
+                                <CheckBox x:Name="ChkAutostartOnBoot" Content="Launch Control Panel on Windows login" Foreground="{DynamicResource TextPrimary}" FontSize="12" Margin="0,4,0,0" Click="ChkAutostartOnBoot_Click" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="2" Style="{StaticResource MetricCard}">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,10">
+                                    <TextBlock Text="Workstation &amp; Storage" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource TextPrimary}" />
+                                    <Button Content="Open Data Folder" Style="{StaticResource SectionActionBtn}" Padding="8,3" HorizontalAlignment="Right" Click="BtnOpenDataDir_Click" />
+                                </Grid>
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="Host" Foreground="{DynamicResource TextSecondary}" FontSize="12" />
+                                    <TextBlock x:Name="TxtMachineName" Text="-" HorizontalAlignment="Right" FontWeight="SemiBold" FontSize="12" Foreground="{DynamicResource TextPrimary}" />
+                                </Grid>
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="Device ID" Foreground="{DynamicResource TextSecondary}" FontSize="12" />
+                                    <TextBlock x:Name="TxtDeviceId" Text="-" HorizontalAlignment="Right" FontFamily="Consolas" FontSize="11" Foreground="{DynamicResource TextPrimary}" />
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="Local database" Foreground="{DynamicResource TextSecondary}" FontSize="12" />
+                                    <TextBlock x:Name="TxtDbSize" Text="-" HorizontalAlignment="Right" FontSize="12" Foreground="{DynamicResource TextPrimary}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <Border Background="{DynamicResource BgCard}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="14,10" Margin="0,0,0,12">
                         <Grid>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <TextBlock Text="Active Log File:" Foreground="{DynamicResource TextSecondary}" Margin="0,0,8,0" />
-                                <TextBlock x:Name="TxtActiveLogFile" Text="C:\ProgramData\PrintMonitor\Logs" FontWeight="SemiBold" Foreground="{DynamicResource AccentInfo}" />
+                                <TextBlock x:Name="TxtActiveLogFile" Text="C:\ProgramData\PrintMonitor\Logs" FontWeight="SemiBold" Foreground="{DynamicResource AccentPrimary}" />
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Button Content="📂 Open Logs Folder" Style="{StaticResource SecondaryBtn}" Margin="0,0,10,0" Click="BtnOpenLogsFolder_Click" />
+                                <Button Content="📂 Open Logs Folder" Style="{StaticResource SectionActionBtn}" Margin="0,0,8,0" Click="BtnOpenLogsFolder_Click" />
                                 <Button Content="🔄 Refresh Logs" Style="{StaticResource PrimaryBtn}" Click="BtnRefreshLogs_Click" />
                             </StackPanel>
                         </Grid>
                     </Border>
+                    </StackPanel>
 
-                    <Border Grid.Row="1" Background="{DynamicResource BgInput}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="8" Padding="12">
+                    <Border Grid.Row="1" Background="{DynamicResource BgInput}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="12">
                         <TextBox x:Name="TxtLogsView"
                                  Background="Transparent"
                                  Foreground="{DynamicResource TextPrimary}"
@@ -1055,21 +1128,19 @@
             </TabItem>
         </TabControl>
 
-        <!-- BOTTOM STATUS BAR -->
-        <Border Grid.Row="2" Background="{DynamicResource BgHeader}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="0,1,0,0" Padding="20,0">
+        <!-- BOTTOM FOOTER STATUS BAR (Matches Image 1 & 2) -->
+        <Border Grid.Row="2" Background="{DynamicResource FooterBg}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="0,1,0,0" Padding="24,0">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock x:Name="TxtStatusBar" Text="Ready. Connected to local database C:\ProgramData\PrintMonitor\printmonitor.db" FontSize="12" Foreground="{DynamicResource TextSecondary}" />
-                </StackPanel>
+                <!-- Left: Connected Database -->
+                <TextBlock Grid.Column="0" x:Name="TxtStatusBar" Text="Connected - C:\ProgramData\PrintMonitor\printmonitor.db" FontSize="11" Foreground="{DynamicResource FooterFg}" VerticalAlignment="Center" />
 
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="Nexrein Printer Monitor Suite v2.0.0 (win-x64 Enterprise)" FontSize="12" Foreground="{DynamicResource TextMuted}" />
-                </StackPanel>
+                <!-- Right: Version info -->
+                <TextBlock Grid.Column="1" Text="Suite v2.0.0 (win-x64 Enterprise)" FontSize="11" Foreground="{DynamicResource FooterFg}" VerticalAlignment="Center" />
             </Grid>
         </Border>
     </Grid>

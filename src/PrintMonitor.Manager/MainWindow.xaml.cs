@@ -105,15 +105,16 @@ public partial class MainWindow : Window
         bool isDark = ThemeManager.IsDarkThemeActive;
         if (isColor)
         {
+            // Matches reference: cyan pill in dark mode, deep teal in light mode
             return isDark
-                ? (new SolidColorBrush(Color.FromRgb(88, 28, 135)), new SolidColorBrush(Color.FromRgb(233, 213, 255)))
-                : (new SolidColorBrush(Color.FromRgb(237, 233, 254)), new SolidColorBrush(Color.FromRgb(109, 40, 217)));
+                ? (new SolidColorBrush(Color.FromRgb(34, 211, 238)), new SolidColorBrush(Color.FromRgb(8, 51, 68)))
+                : (new SolidColorBrush(Color.FromRgb(15, 118, 110)), new SolidColorBrush(Colors.White));
         }
         else
         {
             return isDark
-                ? (new SolidColorBrush(Color.FromRgb(30, 41, 59)), new SolidColorBrush(Color.FromRgb(148, 163, 184)))
-                : (new SolidColorBrush(Color.FromRgb(241, 245, 249)), new SolidColorBrush(Color.FromRgb(71, 85, 105)));
+                ? (new SolidColorBrush(Color.FromRgb(71, 85, 105)), new SolidColorBrush(Color.FromRgb(226, 232, 240)))
+                : (new SolidColorBrush(Color.FromRgb(71, 85, 105)), new SolidColorBrush(Colors.White));
         }
     }
 
@@ -391,43 +392,7 @@ public partial class MainWindow : Window
 
     private void LoadMetrics()
     {
-        try
-        {
-            var stats = _dbContext.GetDetailedJobStats();
-            var printerCount = _dbContext.GetPrinterCount();
-
-            // Daily Stats
-            TxtTodayPages.Text = stats.todayPages.ToString("N0");
-            TxtTodayBreakdown.Text = $"{stats.todayMono:N0} B&W / Gray • {stats.todayColor:N0} Color today";
-            TxtTodayRatio.Text = $"Today: {stats.todayPages:N0} Total Pages ({stats.todayJobs:N0} jobs)";
-
-            // Lifetime Stats
-            TxtTotalPages.Text = stats.totalPages.ToString("N0");
-            TxtPagesSub.Text = $"{stats.totalMono:N0} B&W / Gray • {stats.totalColor:N0} Color";
-
-            // Color vs Mono ratio progress bar
-            var todayTotal = stats.todayPages > 0 ? stats.todayPages : 1;
-            var colorRatio = Math.Clamp((double)stats.todayColor / todayTotal, 0.05, 0.95);
-            var monoRatio = 1.0 - colorRatio;
-            ColColorBar.Width = new GridLength(colorRatio * 100, GridUnitType.Star);
-            ColMonoBar.Width = new GridLength(monoRatio * 100, GridUnitType.Star);
-
-            TxtColorLegend.Text = $"🎨 Color Pages: {stats.todayColor:N0}";
-            TxtMonoLegend.Text = $"🔲 Black & White / Grayscale: {stats.todayMono:N0}";
-
-            // Printers & Jobs
-            TxtPrintersCount.Text = printerCount.ToString();
-            TxtPrintersSub.Text = $"{printerCount} active devices monitored";
-
-            TxtTotalJobs.Text = stats.totalJobs.ToString("N0");
-            TxtJobsSub.Text = $"{stats.pendingSync} Pending cloud synchronization";
-
-            TxtJobTableSummary.Text = $"Tracking {stats.totalJobs:N0} total job(s) | {stats.totalPages:N0} printed page(s)";
-        }
-        catch (Exception ex)
-        {
-            TxtStatusBar.Text = $"Metrics update error: {ex.Message}";
-        }
+        UpdateMetricsOnly();
     }
 
     private void UpdateMetricsOnly()
@@ -435,12 +400,10 @@ public partial class MainWindow : Window
         try
         {
             var stats = _dbContext.GetDetailedJobStats();
-            TxtTodayPages.Text = stats.todayPages.ToString("N0");
-            TxtTodayBreakdown.Text = $"{stats.todayMono:N0} B&W / Gray • {stats.todayColor:N0} Color today";
-            TxtTotalPages.Text = stats.totalPages.ToString("N0");
-            TxtPagesSub.Text = $"{stats.totalMono:N0} B&W / Gray • {stats.totalColor:N0} Color";
-            TxtTotalJobs.Text = stats.totalJobs.ToString("N0");
-            TxtJobsSub.Text = $"{stats.pendingSync} Pending cloud sync";
+            if (TxtJobTableSummary != null)
+                TxtJobTableSummary.Text = $"Tracking {stats.totalJobs:N0} total job(s) | {stats.totalPages:N0} printed page(s) | {stats.pendingSync:N0} pending cloud sync";
+            if (TxtAdminIdentity != null)
+                TxtAdminIdentity.Text = $"Super Admin • {Environment.MachineName.ToUpperInvariant()}";
         }
         catch { }
     }
@@ -537,6 +500,7 @@ public partial class MainWindow : Window
             {
                 var docType = DocumentTypeClassifier.Classify(j.DocumentName);
                 var isColor = string.Equals(j.ColorMode, "Color", StringComparison.OrdinalIgnoreCase);
+                var badge = GetColorBadgeBrushes(isColor);
 
                 return new PrintJobDisplayItem
                 {
@@ -552,31 +516,167 @@ public partial class MainWindow : Window
                     Copies = j.Copies,
                     TotalPagesCalculated = (j.PagesPrinted > 0 ? j.PagesPrinted : (j.Pages * j.Copies)),
                     ColorMode = j.ColorMode,
-                    ColorModeDisplay = isColor ? "🎨 Color" : "🔲 B&W / Gray",
-                    ColorBadgeBg = GetColorBadgeBrushes(isColor).bg,
-                    ColorBadgeFg = GetColorBadgeBrushes(isColor).fg,
+                    ColorModeDisplay = isColor ? "Color" : "B&W",
+                    ModeBadgeText = isColor ? "COLOR" : "B&W",
+                    ColorBadgeBg = badge.bg,
+                    ColorBadgeFg = badge.fg,
                     Duplex = j.Duplex,
                     PaperSize = j.PaperSize,
                     Status = j.Status,
+                    StatusBadgeText = (j.Status ?? "Completed").ToUpperInvariant(),
                     SyncStatus = j.SyncStatus,
-                    SubmittedAtLocal = j.SubmittedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")
+                    SubmittedAtLocal = j.SubmittedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm"),
+                    SubmittedLocal = j.SubmittedAt.ToLocalTime()
                 };
             }).ToList();
 
             DgDashboardJobs.ItemsSource = items;
 
-            if (TxtDashKpiPeriod != null) TxtDashKpiPeriod.Text = label;
-            if (TxtDashKpiPages != null) TxtDashKpiPages.Text = $"{stats.pagesCount:N0} Pages";
-            if (TxtDashKpiBreakdown != null) TxtDashKpiBreakdown.Text = $"{stats.colorPages:N0} Color • {stats.monoPages:N0} B&W";
-            if (TxtDashKpiJobs != null) TxtDashKpiJobs.Text = $"{stats.jobsCount:N0} Jobs";
-            if (TxtDashDateBadge != null) TxtDashDateBadge.Text = $"{label} ({stats.jobsCount:N0} prints)";
-            if (TxtDashTableFooter != null) TxtDashTableFooter.Text = $"Showing {items.Count} print job(s) for {label} | Total: {stats.pagesCount:N0} pages";
+            // ---- KPI cards ----
+            int total = stats.pagesCount;
+            int color = stats.colorPages;
+            int mono = stats.monoPages;
+            int jobCount = stats.jobsCount;
+            int failed = items.Count(i => (i.Status ?? "").Contains("fail", StringComparison.OrdinalIgnoreCase)
+                                       || (i.Status ?? "").Contains("error", StringComparison.OrdinalIgnoreCase));
+            double colorPct = total > 0 ? (double)color / total : 0;
+
+            TxtTodayPages.Text = total.ToString("N0");
+            TxtTotalPagesSub.Text = "All printers";
+            TxtColorPagesVal.Text = color.ToString("N0");
+            TxtColorPagesSub.Text = $"{Math.Round(colorPct * 100):0}% of output";
+            TxtMonoPagesVal.Text = mono.ToString("N0");
+            TxtMonoPagesSub.Text = $"{(total > 0 ? Math.Round((double)mono / total * 100) : 0):0}% of output";
+            TxtTodayJobsVal.Text = jobCount.ToString("N0");
+            TxtJobsSub.Text = label == "Today" ? "Recorded today" : $"Recorded · {label}";
+            TxtSuccessRateVal.Text = jobCount > 0 ? $"{Math.Round((double)(jobCount - failed) / jobCount * 100):0}%" : "100%";
+            TxtFailedJobsSub.Text = $"{failed} failed jobs";
+            TxtAvgPagesJobVal.Text = jobCount > 0 ? ((double)total / jobCount).ToString("0.0") : "0.0";
+
+            // ---- Overview title ----
+            TxtOverviewDate.Text = label == "Today"
+                ? $"Print Accounting Overview · Today, {DateTime.Now:dd MMM yyyy}"
+                : $"Print Accounting Overview · {label}";
+
+            // ---- Donut ----
+            UpdateDonut(colorPct, total);
+            TxtDonutColorText.Text = $"Color · {color:N0} pages";
+            TxtDonutMonoText.Text = $"B&W · {mono:N0} pages";
+
+            // ---- Pages by hour ----
+            UpdateHourlyBars(items);
+
+            // ---- Printers card ----
+            UpdatePrintersCard(items);
+
+            TxtLiveActivityCount.Text = $"{jobCount:N0} jobs · {total:N0} pages";
         }
         catch (Exception ex)
         {
             if (TxtStatusBar != null)
                 TxtStatusBar.Text = $"Dashboard prints notice: {ex.Message}";
         }
+    }
+
+    private void UpdateDonut(double colorPct, int total)
+    {
+        TxtDonutPercent.Text = total > 0 ? $"{Math.Round(colorPct * 100):0}%" : "0%";
+        DonutFullRing.Visibility = colorPct >= 0.999 && total > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+        if (total == 0 || colorPct <= 0.001 || colorPct >= 0.999)
+        {
+            DonutColorArc.Data = null;
+            return;
+        }
+
+        const double size = 92, stroke = 11;
+        double r = (size - stroke) / 2, c = size / 2;
+        double angle = colorPct * 360.0;
+        double rad = (angle - 90) * Math.PI / 180.0;
+        var start = new Point(c, c - r);
+        var end = new Point(c + r * Math.Cos(rad), c + r * Math.Sin(rad));
+
+        var fig = new PathFigure { StartPoint = start, IsClosed = false };
+        fig.Segments.Add(new ArcSegment(end, new Size(r, r), 0, angle > 180, SweepDirection.Clockwise, true));
+        var geo = new PathGeometry();
+        geo.Figures.Add(fig);
+        DonutColorArc.Data = geo;
+    }
+
+    private void UpdateHourlyBars(List<PrintJobDisplayItem> items)
+    {
+        GridHourBars.Children.Clear();
+        GridHourBars.ColumnDefinitions.Clear();
+        GridHourLabels.Children.Clear();
+        GridHourLabels.ColumnDefinitions.Clear();
+
+        var byHour = items.GroupBy(i => i.SubmittedLocal.Hour)
+                          .ToDictionary(g => g.Key, g => g.Sum(x => x.TotalPagesCalculated));
+
+        int nowHour = DateTime.Now.Hour;
+        int startHour = byHour.Count > 0 ? Math.Min(byHour.Keys.Min(), nowHour) : Math.Max(0, nowHour - 4);
+        int endHour = byHour.Count > 0 ? Math.Max(byHour.Keys.Max(), nowHour) : nowHour;
+        if (endHour - startHour < 4) startHour = Math.Max(0, endHour - 4);
+        if (endHour - startHour > 11) startHour = endHour - 11;
+
+        int max = Math.Max(1, byHour.Values.DefaultIfEmpty(0).Max());
+        var barBrush = (Brush)FindResource("AccentPrimary");
+        var labelBrush = (Brush)FindResource("TextSecondary");
+
+        for (int h = startHour, col = 0; h <= endHour; h++, col++)
+        {
+            GridHourBars.ColumnDefinitions.Add(new ColumnDefinition());
+            GridHourLabels.ColumnDefinitions.Add(new ColumnDefinition());
+
+            byHour.TryGetValue(h, out var pages);
+            var bar = new Border
+            {
+                Width = 22,
+                Height = Math.Max(3, pages / (double)max * 85),
+                Background = barBrush,
+                CornerRadius = new CornerRadius(2, 2, 0, 0),
+                VerticalAlignment = VerticalAlignment.Bottom,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                ToolTip = $"{h:00}:00 — {pages} page(s)"
+            };
+            Grid.SetColumn(bar, col);
+            GridHourBars.Children.Add(bar);
+
+            var lbl = new TextBlock
+            {
+                Text = h.ToString("00"),
+                FontSize = 10,
+                Foreground = labelBrush,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            Grid.SetColumn(lbl, col);
+            GridHourLabels.Children.Add(lbl);
+        }
+    }
+
+    private void UpdatePrintersCard(List<PrintJobDisplayItem> items)
+    {
+        try
+        {
+            var pagesByPrinter = items.GroupBy(i => i.PrinterName ?? "")
+                                      .ToDictionary(g => g.Key, g => g.Sum(x => x.TotalPagesCalculated), StringComparer.OrdinalIgnoreCase);
+            var printers = _dbContext.GetAllPrinters().Where(p => p.IsActive).ToList();
+
+            var rows = printers
+                .Select(p => (p, pages: pagesByPrinter.TryGetValue(p.Name, out var n) ? n : 0))
+                .OrderByDescending(x => x.pages).ThenBy(x => x.p.Name)
+                .Select(x => new DashPrinterRow
+                {
+                    Name = x.p.Name,
+                    PagesDisplay = $"{x.pages} pages",
+                    StatusDisplay = string.Equals(x.p.Status, "Offline", StringComparison.OrdinalIgnoreCase) ? "OFFLINE" : "ONLINE"
+                }).ToList();
+
+            IcDashPrinters.ItemsSource = rows;
+            int online = rows.Count(r => r.StatusDisplay == "ONLINE");
+            TxtPrintersOnlineSub.Text = $"{online} printer{(online == 1 ? "" : "s")} online";
+        }
+        catch { }
     }
 
     private void CmbDashDateFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -906,8 +1006,8 @@ public partial class MainWindow : Window
         if (TxtShopName != null) TxtShopName.Text = s.ShopName ?? string.Empty;
         TxtApiBaseUrl.Text = "https://printmonitor.nexreindigital.co.ke/api"; // Permanently locked & hardcoded
         TxtApiKey.Text = s.ApiKey;
-        TxtSyncInterval.Text = s.SyncIntervalSeconds.ToString();
-        TxtHeartbeatInterval.Text = s.HeartbeatIntervalSeconds.ToString();
+        TxtSyncInterval.Text = (s.SyncIntervalSeconds > 0 ? s.SyncIntervalSeconds : 10).ToString();
+        TxtHeartbeatInterval.Text = (s.HeartbeatIntervalSeconds > 0 ? s.HeartbeatIntervalSeconds : 10).ToString();
         TxtPollingInterval.Text = s.PollingIntervalSeconds.ToString();
 
         foreach (ComboBoxItem item in CmbLogLevel.Items)
@@ -1087,12 +1187,42 @@ public partial class MainWindow : Window
 
     private void MainTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        if (e.Source is TabControl)
+            UpdateNavStrip(MainTabs.SelectedIndex);
+
         if (!_isLoaded || _isUpdatingUi) return;
         if (e.Source is TabControl)
         {
-            if (MainTabs.SelectedIndex == 1) LoadJobs();
+            if (MainTabs.SelectedIndex == 0) LoadDashboardPrints();
+            else if (MainTabs.SelectedIndex == 1) LoadJobs();
             else if (MainTabs.SelectedIndex == 2) LoadPrinters();
-            else if (MainTabs.SelectedIndex == 4) LoadLogs();
+            else if (MainTabs.SelectedIndex == 4) { LoadMachineAndStorageInfo(); LoadLogs(); }
+        }
+    }
+
+    private void NavTab_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        // Prevent the header drag handler from swallowing tab clicks
+        e.Handled = true;
+        if (sender is FrameworkElement fe && int.TryParse(fe.Tag?.ToString(), out var idx) && MainTabs != null)
+        {
+            MainTabs.SelectedIndex = idx;
+            UpdateNavStrip(idx);
+        }
+    }
+
+    private void UpdateNavStrip(int selected)
+    {
+        var indicators = new[] { TabIndicator0, TabIndicator1, TabIndicator2, TabIndicator3, TabIndicator4 };
+        var headers = new[] { TabHeader0, TabHeader1, TabHeader2, TabHeader3, TabHeader4 };
+        for (int i = 0; i < indicators.Length; i++)
+        {
+            if (indicators[i] == null || headers[i] == null) continue;
+            bool active = i == selected;
+            if (active) indicators[i].SetResourceReference(Border.BorderBrushProperty, "TabActiveBorder");
+            else indicators[i].BorderBrush = Brushes.Transparent;
+            headers[i].SetResourceReference(TextBlock.ForegroundProperty, active ? "TabActiveFg" : "TabInactiveFg");
+            headers[i].FontWeight = active ? FontWeights.Bold : FontWeights.SemiBold;
         }
     }
 
@@ -1319,6 +1449,9 @@ public class PrintJobDisplayItem
     public int TotalPagesCalculated { get; set; }
     public string ColorMode { get; set; } = string.Empty;
     public string ColorModeDisplay { get; set; } = string.Empty;
+    public string ModeBadgeText { get; set; } = string.Empty;
+    public string StatusBadgeText { get; set; } = string.Empty;
+    public DateTime SubmittedLocal { get; set; }
     public SolidColorBrush ColorBadgeBg { get; set; } = Brushes.Transparent;
     public SolidColorBrush ColorBadgeFg { get; set; } = Brushes.White;
     public string Duplex { get; set; } = string.Empty;
@@ -1326,6 +1459,13 @@ public class PrintJobDisplayItem
     public string Status { get; set; } = string.Empty;
     public string SyncStatus { get; set; } = string.Empty;
     public string SubmittedAtLocal { get; set; } = string.Empty;
+}
+
+public class DashPrinterRow
+{
+    public string Name { get; set; } = string.Empty;
+    public string PagesDisplay { get; set; } = string.Empty;
+    public string StatusDisplay { get; set; } = string.Empty;
 }
 
 public class PrinterDisplayItem

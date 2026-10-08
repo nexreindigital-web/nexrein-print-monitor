@@ -66,7 +66,7 @@ public class HealthCheckService : IHealthCheckService
 
     private async Task HeartbeatLoopAsync(CancellationToken token)
     {
-        var interval = TimeSpan.FromSeconds(Math.Max(10, _settingsManager.Settings.HeartbeatIntervalSeconds));
+        var interval = TimeSpan.FromSeconds(Math.Max(5, _settingsManager.Settings.HeartbeatIntervalSeconds));
 
         while (!token.IsCancellationRequested)
         {

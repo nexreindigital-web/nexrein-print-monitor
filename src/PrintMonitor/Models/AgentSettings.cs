@@ -9,8 +9,8 @@ public class AgentSettings
     public string DeviceId { get; set; } = string.Empty;
     public string UserEmail { get; set; } = string.Empty;
     public string ShopName { get; set; } = string.Empty;
-    public int SyncIntervalSeconds { get; set; } = 30;
-    public int HeartbeatIntervalSeconds { get; set; } = 60;
+    public int SyncIntervalSeconds { get; set; } = 10;
+    public int HeartbeatIntervalSeconds { get; set; } = 10;
     public int PollingIntervalSeconds { get; set; } = 5;
     public int MaxBatchSize { get; set; } = 50;
     public int MaxRetryAttempts { get; set; } = 5;

@@ -96,12 +96,18 @@ class AuthController extends Controller
             $user->must_change_password = false;
             $user->save();
 
+            // Automatically sync the new password to all computers tied to this user's email!
+            \App\Models\Device::where('user_email', $user->email)->update([
+                'software_password' => $request->password,
+                'pending_password_update' => $request->password,
+            ]);
+
             DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
             Auth::login($user);
             $request->session()->regenerate();
 
-            return redirect()->route('dashboard')->with('success', 'Your password has been reset successfully!');
+            return redirect()->route('dashboard')->with('success', 'Your password has been reset successfully! Your desktop installations will update their admin password automatically within 10 seconds.');
         }
 
         return back()->withErrors(['email' => 'Unable to find user with that email.']);
@@ -138,7 +144,13 @@ class AuthController extends Controller
         $user->must_change_password = false;
         $user->save();
 
-        return redirect()->route('dashboard')->with('success', 'Your password has been updated securely!');
+        // Automatically sync the new password to all computers tied to this user's email!
+        \App\Models\Device::where('user_email', $user->email)->update([
+            'software_password' => $request->password,
+            'pending_password_update' => $request->password,
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Your password has been updated securely! All your desktop installations will update their admin password automatically within 10 seconds.');
     }
 
     public function logout(Request $request)

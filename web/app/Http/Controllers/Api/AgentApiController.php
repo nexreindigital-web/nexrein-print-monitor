@@ -126,13 +126,52 @@ class AgentApiController extends Controller
 
         $device = $this->resolveDevice($request) ?? Device::where('device_id', $deviceId)->first();
 
-        if (!$device) {
-            return response()->json(['status' => 'not_found', 'error' => 'Device not registered'], 404);
+        $email = strtolower(trim((string) $request->input('user_email')));
+        $computerName = trim((string) $request->input('computer_name', 'Workstation'));
+        $shopName = trim((string) $request->input('shop_name', 'Main Shop'));
+
+        // If user email is present, ensure user account is provisioned with default password 'admin'
+        if (!empty($email)) {
+            $user = User::where('email', $email)->first();
+            if (!$user) {
+                User::create([
+                    'name'                 => !empty($shopName) ? $shopName : 'Shop Admin',
+                    'email'                => $email,
+                    'password'             => Hash::make('admin'),
+                    'shop_name'            => $shopName ?: 'Main Shop',
+                    'must_change_password' => true,
+                ]);
+            }
         }
 
-        $device->status = $request->input('status', 'Online');
-        $device->last_heartbeat_at = now();
-        $device->save();
+        // Auto-register device if not yet in database (e.g. after fresh DB or initial boot)
+        if (!$device) {
+            $device = Device::create([
+                'device_id'         => $deviceId,
+                'api_token'         => Str::random(48),
+                'computer_name'     => $computerName,
+                'shop_name'         => $shopName,
+                'user_email'        => !empty($email) ? $email : 'admin@nexreindigital.co.ke',
+                'ip_address'        => $request->ip(),
+                'app_version'       => $request->input('application_version', '2.0.0'),
+                'status'            => 'Online',
+                'last_heartbeat_at' => now(),
+            ]);
+        } else {
+            // Update email or computer if received
+            if (!empty($email) && $device->user_email !== $email) {
+                $device->user_email = $email;
+            }
+            if (!empty($computerName) && $computerName !== 'Workstation') {
+                $device->computer_name = $computerName;
+            }
+            if (!empty($shopName) && $shopName !== 'Main Shop') {
+                $device->shop_name = $shopName;
+            }
+            $device->status = $request->input('status', 'Online');
+            $device->last_heartbeat_at = now();
+            $device->save();
+        }
 
         $response = [
             'status'      => 'ok',
@@ -183,7 +222,20 @@ class AgentApiController extends Controller
         $device = Device::where('device_id', $deviceId)->first();
         $shopName = $device ? $device->shop_name : 'Default Shop';
         $computerName = $device ? $device->computer_name : 'Workstation';
-        $userEmail = $device ? $device->user_email : null;
+        $userEmail = $device ? $device->user_email : strtolower(trim((string) $request->input('user_email')));
+
+        if (!empty($userEmail)) {
+            $user = User::where('email', $userEmail)->first();
+            if (!$user) {
+                User::create([
+                    'name'                 => $shopName,
+                    'email'                => $userEmail,
+                    'password'             => Hash::make('admin'),
+                    'shop_name'            => $shopName,
+                    'must_change_password' => true,
+                ]);
+            }
+        }
 
         $syncedCount = 0;
 

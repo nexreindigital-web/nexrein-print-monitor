@@ -86,65 +86,137 @@ public static class ThemeManager
 
     private static void SetDarkTheme(ResourceDictionary dict)
     {
-        dict["BgWindow"] = new SolidColorBrush(Color.FromRgb(11, 15, 25));       // #0B0F19
-        dict["BgHeader"] = new SolidColorBrush(Color.FromRgb(17, 24, 39));       // #111827
-        dict["BgCard"] = new SolidColorBrush(Color.FromRgb(26, 34, 52));         // #1A2234
-        dict["BgCardHover"] = new SolidColorBrush(Color.FromRgb(36, 48, 72));    // #243048
-        dict["BgInput"] = new SolidColorBrush(Color.FromRgb(17, 24, 39));        // #111827
-        dict["BorderColor"] = new SolidColorBrush(Color.FromRgb(38, 51, 77));    // #26334D
-        dict["BorderLight"] = new SolidColorBrush(Color.FromRgb(51, 65, 85));    // #334155
+        // Image 1: Dark Mode Palette
+        dict["BgWindow"] = new SolidColorBrush(Color.FromRgb(10, 15, 29));        // #0A0F1D Deep navy body
+        dict["BgHeader"] = new SolidColorBrush(Color.FromRgb(12, 19, 34));        // #0C1322 Midnight header
+        dict["BgCard"] = new SolidColorBrush(Color.FromRgb(17, 28, 53));          // #111C35 Dark card
+        dict["BgCardHover"] = new SolidColorBrush(Color.FromRgb(22, 35, 66));     // #162342 Card hover
+        dict["BgInput"] = new SolidColorBrush(Color.FromRgb(14, 23, 46));         // #0E172E Input box
+        dict["BorderColor"] = new SolidColorBrush(Color.FromRgb(30, 45, 74));     // #1E2D4A Card border
+        dict["BorderLight"] = new SolidColorBrush(Color.FromRgb(42, 59, 94));     // #2A3B5E
 
-        dict["TextPrimary"] = new SolidColorBrush(Color.FromRgb(248, 250, 252)); // #F8FAFC
-        dict["TextSecondary"] = new SolidColorBrush(Color.FromRgb(148, 163, 184));// #94A3B8
-        dict["TextMuted"] = new SolidColorBrush(Color.FromRgb(100, 116, 139));   // #64748B
+        dict["TextPrimary"] = new SolidColorBrush(Color.FromRgb(255, 255, 255));  // #FFFFFF Primary text
+        dict["TextSecondary"] = new SolidColorBrush(Color.FromRgb(148, 163, 184));// #94A3B8 Secondary text
+        dict["TextMuted"] = new SolidColorBrush(Color.FromRgb(100, 116, 139));    // #64748B Muted text
 
-        dict["AccentPrimary"] = new SolidColorBrush(Color.FromRgb(99, 102, 241));// #6366F1
-        dict["AccentPrimaryHover"] = new SolidColorBrush(Color.FromRgb(79, 70, 229));
-        dict["AccentSuccess"] = new SolidColorBrush(Color.FromRgb(16, 185, 129));// #10B981
+        // Actions & Accents
+        dict["AccentPrimary"] = new SolidColorBrush(Color.FromRgb(56, 189, 248)); // #38BDF8 Sky Blue
+        dict["AccentPrimaryHover"] = new SolidColorBrush(Color.FromRgb(14, 165, 233));
+        dict["AccentSuccess"] = new SolidColorBrush(Color.FromRgb(16, 185, 129)); // #10B981 Emerald
         dict["AccentSuccessHover"] = new SolidColorBrush(Color.FromRgb(5, 150, 105));
-        dict["AccentWarning"] = new SolidColorBrush(Color.FromRgb(245, 158, 11));// #F59E0B
-        dict["AccentDanger"] = new SolidColorBrush(Color.FromRgb(239, 68, 68));  // #EF4444
-        dict["AccentDangerHover"] = new SolidColorBrush(Color.FromRgb(220, 38, 38));
-        dict["AccentInfo"] = new SolidColorBrush(Color.FromRgb(14, 165, 233));   // #0EA5E9
+        dict["AccentWarning"] = new SolidColorBrush(Color.FromRgb(245, 158, 11)); // #F59E0B
+        dict["AccentDanger"] = new SolidColorBrush(Color.FromRgb(220, 38, 38));   // #DC2626 Red Stop button
+        dict["AccentDangerHover"] = new SolidColorBrush(Color.FromRgb(185, 28, 28));
+        dict["AccentInfo"] = new SolidColorBrush(Color.FromRgb(34, 211, 238));    // #22D3EE Cyan
 
-        dict["DataGridHeaderBg"] = new SolidColorBrush(Color.FromRgb(17, 24, 39));
-        dict["DataGridRowBg"] = new SolidColorBrush(Color.FromRgb(26, 34, 52));
-        dict["DataGridRowAlt"] = new SolidColorBrush(Color.FromRgb(20, 28, 45));
-        dict["DataGridSelected"] = new SolidColorBrush(Color.FromRgb(46, 56, 86));
+        // Navigation Tabs
+        dict["TabActiveBorder"] = new SolidColorBrush(Color.FromRgb(56, 189, 248)); // #38BDF8
+        dict["TabActiveFg"] = new SolidColorBrush(Color.FromRgb(255, 255, 255));
+        dict["TabInactiveFg"] = new SolidColorBrush(Color.FromRgb(148, 163, 184));
 
-        dict["LockBadgeBg"] = new SolidColorBrush(Color.FromRgb(49, 46, 129));   // #312E81
-        dict["LockBadgeFg"] = new SolidColorBrush(Color.FromRgb(199, 210, 254)); // #C7D2FE
+        // Header Action Buttons
+        dict["HeaderBtnBg"] = new SolidColorBrush(Color.FromRgb(30, 41, 59));     // #1E293B
+        dict["HeaderBtnBorder"] = new SolidColorBrush(Color.FromRgb(51, 65, 85)); // #334155
+        dict["HeaderBtnFg"] = new SolidColorBrush(Color.FromRgb(226, 232, 240));  // #E2E8F0
+
+        // Service Badge
+        dict["ServiceBadgeBg"] = new SolidColorBrush(Color.FromRgb(2, 44, 34));   // #022C22
+        dict["ServiceBadgeBorder"] = new SolidColorBrush(Color.FromRgb(5, 150, 105)); // #059669
+        dict["ServiceBadgeFg"] = new SolidColorBrush(Color.FromRgb(52, 211, 153));// #34D399
+
+        // Action Buttons on Section Bar (Today, Simulate Print, Export CSV)
+        dict["SectionBtnBg"] = new SolidColorBrush(Color.FromRgb(17, 28, 53));    // #111C35
+        dict["SectionBtnBorder"] = new SolidColorBrush(Color.FromRgb(30, 45, 74));// #1E2D4A
+        dict["SectionBtnFg"] = new SolidColorBrush(Color.FromRgb(255, 255, 255)); // White
+
+        // 6 KPI Metric Values
+        dict["KpiVal1"] = new SolidColorBrush(Color.FromRgb(56, 189, 248));       // #38BDF8 Total Pages
+        dict["KpiVal2"] = new SolidColorBrush(Color.FromRgb(34, 211, 238));       // #22D3EE Color Pages
+        dict["KpiVal3"] = new SolidColorBrush(Color.FromRgb(203, 213, 225));      // #CBD5E1 B&W Pages
+        dict["KpiVal4"] = new SolidColorBrush(Color.FromRgb(192, 132, 252));      // #C084FC Print Jobs
+        dict["KpiVal5"] = new SolidColorBrush(Color.FromRgb(52, 211, 153));       // #34D399 Success Rate
+        dict["KpiVal6"] = new SolidColorBrush(Color.FromRgb(251, 146, 60));       // #FB923C Avg Pages/Job
+
+        // Table & Badges
+        dict["DataGridHeaderBg"] = new SolidColorBrush(Color.FromRgb(17, 28, 53));
+        dict["DataGridRowBg"] = new SolidColorBrush(Color.FromRgb(17, 28, 53));
+        dict["DataGridRowAlt"] = new SolidColorBrush(Color.FromRgb(14, 23, 46));
+        dict["DataGridSelected"] = new SolidColorBrush(Color.FromRgb(30, 45, 74));
+        dict["BadgeColorBg"] = new SolidColorBrush(Color.FromRgb(8, 145, 178));   // #0891B2
+        dict["BadgeCompletedBg"] = new SolidColorBrush(Color.FromRgb(2, 44, 34)); // #022C22
+        dict["BadgeCompletedBorder"] = new SolidColorBrush(Color.FromRgb(5, 150, 105));
+        dict["BadgeCompletedFg"] = new SolidColorBrush(Color.FromRgb(52, 211, 153));
+
+        // Footer Bar
+        dict["FooterBg"] = new SolidColorBrush(Color.FromRgb(12, 19, 34));
+        dict["FooterFg"] = new SolidColorBrush(Color.FromRgb(148, 163, 184));
     }
 
     private static void SetLightTheme(ResourceDictionary dict)
     {
-        dict["BgWindow"] = new SolidColorBrush(Color.FromRgb(248, 250, 252));    // #F8FAFC
-        dict["BgHeader"] = new SolidColorBrush(Color.FromRgb(255, 255, 255));    // #FFFFFF
-        dict["BgCard"] = new SolidColorBrush(Color.FromRgb(255, 255, 255));      // #FFFFFF
-        dict["BgCardHover"] = new SolidColorBrush(Color.FromRgb(241, 245, 249)); // #F1F5F9
-        dict["BgInput"] = new SolidColorBrush(Color.FromRgb(248, 250, 252));     // #F8FAFC
-        dict["BorderColor"] = new SolidColorBrush(Color.FromRgb(226, 232, 240)); // #E2E8F0
-        dict["BorderLight"] = new SolidColorBrush(Color.FromRgb(203, 213, 225)); // #CBD5E1
+        // Image 2: Light Mode Palette (Keeps matching dark navy header!)
+        dict["BgWindow"] = new SolidColorBrush(Color.FromRgb(237, 242, 247));     // #EDF2F7 Clean light body
+        dict["BgHeader"] = new SolidColorBrush(Color.FromRgb(12, 19, 34));        // #0C1322 Dark header preserved!
+        dict["BgCard"] = new SolidColorBrush(Color.FromRgb(255, 255, 255));       // #FFFFFF Pure white card
+        dict["BgCardHover"] = new SolidColorBrush(Color.FromRgb(248, 250, 252));  // #F8FAFC
+        dict["BgInput"] = new SolidColorBrush(Color.FromRgb(255, 255, 255));      // #FFFFFF
+        dict["BorderColor"] = new SolidColorBrush(Color.FromRgb(226, 232, 240));  // #E2E8F0
+        dict["BorderLight"] = new SolidColorBrush(Color.FromRgb(203, 213, 225));  // #CBD5E1
 
-        dict["TextPrimary"] = new SolidColorBrush(Color.FromRgb(15, 23, 42));     // #0F172A
+        dict["TextPrimary"] = new SolidColorBrush(Color.FromRgb(15, 23, 42));     // #0F172A Dark primary text
         dict["TextSecondary"] = new SolidColorBrush(Color.FromRgb(71, 85, 105));  // #475569
-        dict["TextMuted"] = new SolidColorBrush(Color.FromRgb(100, 116, 139));   // #64748B
+        dict["TextMuted"] = new SolidColorBrush(Color.FromRgb(100, 116, 139));    // #64748B
 
-        dict["AccentPrimary"] = new SolidColorBrush(Color.FromRgb(79, 70, 229)); // #4F46E5
-        dict["AccentPrimaryHover"] = new SolidColorBrush(Color.FromRgb(67, 56, 202));
-        dict["AccentSuccess"] = new SolidColorBrush(Color.FromRgb(5, 150, 105));  // #059669
+        // Actions & Accents
+        dict["AccentPrimary"] = new SolidColorBrush(Color.FromRgb(37, 99, 235));  // #2563EB Blue
+        dict["AccentPrimaryHover"] = new SolidColorBrush(Color.FromRgb(29, 78, 216));
+        dict["AccentSuccess"] = new SolidColorBrush(Color.FromRgb(5, 150, 105));  // #059669 Emerald
         dict["AccentSuccessHover"] = new SolidColorBrush(Color.FromRgb(4, 120, 87));
         dict["AccentWarning"] = new SolidColorBrush(Color.FromRgb(217, 119, 6));  // #D97706
-        dict["AccentDanger"] = new SolidColorBrush(Color.FromRgb(220, 38, 38));  // #DC2626
+        dict["AccentDanger"] = new SolidColorBrush(Color.FromRgb(220, 38, 38));   // #DC2626
         dict["AccentDangerHover"] = new SolidColorBrush(Color.FromRgb(185, 28, 28));
-        dict["AccentInfo"] = new SolidColorBrush(Color.FromRgb(2, 132, 199));    // #0284C7
+        dict["AccentInfo"] = new SolidColorBrush(Color.FromRgb(13, 148, 136));    // #0D9488
 
-        dict["DataGridHeaderBg"] = new SolidColorBrush(Color.FromRgb(241, 245, 249));
+        // Navigation Tabs (On dark header)
+        dict["TabActiveBorder"] = new SolidColorBrush(Color.FromRgb(56, 189, 248)); // #38BDF8
+        dict["TabActiveFg"] = new SolidColorBrush(Color.FromRgb(255, 255, 255));
+        dict["TabInactiveFg"] = new SolidColorBrush(Color.FromRgb(148, 163, 184));
+
+        // Header Action Buttons
+        dict["HeaderBtnBg"] = new SolidColorBrush(Color.FromRgb(30, 41, 59));
+        dict["HeaderBtnBorder"] = new SolidColorBrush(Color.FromRgb(51, 65, 85));
+        dict["HeaderBtnFg"] = new SolidColorBrush(Color.FromRgb(226, 232, 240));
+
+        // Service Badge
+        dict["ServiceBadgeBg"] = new SolidColorBrush(Color.FromRgb(2, 44, 34));
+        dict["ServiceBadgeBorder"] = new SolidColorBrush(Color.FromRgb(5, 150, 105));
+        dict["ServiceBadgeFg"] = new SolidColorBrush(Color.FromRgb(52, 211, 153));
+
+        // Action Buttons on Section Bar (Today, Simulate Print, Export CSV)
+        dict["SectionBtnBg"] = new SolidColorBrush(Color.FromRgb(255, 255, 255)); // White
+        dict["SectionBtnBorder"] = new SolidColorBrush(Color.FromRgb(203, 213, 225)); // #CBD5E1
+        dict["SectionBtnFg"] = new SolidColorBrush(Color.FromRgb(15, 23, 42));    // Dark
+
+        // 6 KPI Metric Values
+        dict["KpiVal1"] = new SolidColorBrush(Color.FromRgb(29, 78, 216));        // #1D4ED8 Total Pages
+        dict["KpiVal2"] = new SolidColorBrush(Color.FromRgb(13, 148, 136));       // #0D9488 Color Pages
+        dict["KpiVal3"] = new SolidColorBrush(Color.FromRgb(71, 85, 105));        // #475569 B&W Pages
+        dict["KpiVal4"] = new SolidColorBrush(Color.FromRgb(124, 58, 237));       // #7C3AED Print Jobs
+        dict["KpiVal5"] = new SolidColorBrush(Color.FromRgb(5, 150, 105));        // #059669 Success Rate
+        dict["KpiVal6"] = new SolidColorBrush(Color.FromRgb(217, 119, 6));        // #D97706 Avg Pages/Job
+
+        // Table & Badges
+        dict["DataGridHeaderBg"] = new SolidColorBrush(Color.FromRgb(248, 250, 252));
         dict["DataGridRowBg"] = new SolidColorBrush(Color.FromRgb(255, 255, 255));
         dict["DataGridRowAlt"] = new SolidColorBrush(Color.FromRgb(248, 250, 252));
-        dict["DataGridSelected"] = new SolidColorBrush(Color.FromRgb(224, 231, 255));
+        dict["DataGridSelected"] = new SolidColorBrush(Color.FromRgb(226, 232, 240));
+        dict["BadgeColorBg"] = new SolidColorBrush(Color.FromRgb(13, 148, 136));   // #0D9488
+        dict["BadgeCompletedBg"] = new SolidColorBrush(Color.FromRgb(220, 252, 231));// #DCFCE7
+        dict["BadgeCompletedBorder"] = new SolidColorBrush(Color.FromRgb(134, 239, 172));
+        dict["BadgeCompletedFg"] = new SolidColorBrush(Color.FromRgb(22, 101, 52)); // #166534
 
-        dict["LockBadgeBg"] = new SolidColorBrush(Color.FromRgb(238, 242, 255)); // #EEF2FF
-        dict["LockBadgeFg"] = new SolidColorBrush(Color.FromRgb(67, 56, 202));   // #4338CA
+        // Footer Bar
+        dict["FooterBg"] = new SolidColorBrush(Color.FromRgb(237, 242, 247));
+        dict["FooterFg"] = new SolidColorBrush(Color.FromRgb(100, 116, 139));
     }
 }
