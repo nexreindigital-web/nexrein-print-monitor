@@ -1,7 +1,7 @@
 $installer = ".\release\PrintMonitor-Setup.exe"
 Write-Host "Running installer: $installer..." -ForegroundColor Cyan
 
-$proc = Start-Process -FilePath $installer -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART" -Wait -PassThru
+$proc = Start-Process -FilePath $installer -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART" -Verb RunAs -Wait -PassThru
 Write-Host "Installer finished with ExitCode: $($proc.ExitCode)" -ForegroundColor Green
 
 Start-Sleep -Seconds 2

@@ -37,9 +37,16 @@ public class ApiClient : IApiClient
     private void PrepareHeaders()
     {
         var settings = _settingsManager.Settings;
-        var baseUrl = settings.ApiBaseUrl.TrimEnd('/');
+        var rawUrl = (settings.ApiBaseUrl ?? "https://printmonitor.nexreindigital.co.ke/api").Trim().TrimEnd('/');
+        
+        // Ensure the URL targets the API root and terminates with a trailing slash for RFC 3986 relative URI resolution
+        if (!rawUrl.EndsWith("/api", StringComparison.OrdinalIgnoreCase))
+        {
+            rawUrl += "/api";
+        }
+        var baseUrl = rawUrl + "/";
 
-        if (_httpClient.BaseAddress == null || _httpClient.BaseAddress.ToString().TrimEnd('/') != baseUrl)
+        if (_httpClient.BaseAddress == null || _httpClient.BaseAddress.ToString() != baseUrl)
         {
             if (Uri.TryCreate(baseUrl, UriKind.Absolute, out var uri))
             {
@@ -49,7 +56,7 @@ public class ApiClient : IApiClient
 
         _httpClient.DefaultRequestHeaders.Clear();
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        _httpClient.DefaultRequestHeaders.Add("User-Agent", "PrintMonitor-Agent/1.0.0");
+        _httpClient.DefaultRequestHeaders.Add("User-Agent", "Nexrein-PrinterMonitor-Agent/2.0.0");
 
         if (!string.IsNullOrWhiteSpace(settings.ApiKey))
         {
@@ -81,6 +88,10 @@ public class ApiClient : IApiClient
             if (response.IsSuccessStatusCode)
             {
                 var result = JsonSerializer.Deserialize<DeviceRegisterResponse>(responseBody, JsonOptions);
+                if (result != null && !string.IsNullOrWhiteSpace(result.ApiKey))
+                {
+                    _settingsManager.SaveSettings(s => s.ApiKey = result.ApiKey);
+                }
                 return (true, result, null);
             }
 

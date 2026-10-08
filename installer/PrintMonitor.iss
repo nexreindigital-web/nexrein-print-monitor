@@ -63,8 +63,9 @@ Name: "{group}\Uninstall Nexrein Printer Monitor"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\Nexrein Printer Monitor"; Filename: "{app}\{#MyManagerExeName}"; Tasks: desktopicon; IconFilename: "{app}\app.ico"
 
 [Run]
-; 1. Register Service with sc.exe
+; 1. Register or update Service with sc.exe
 Filename: "{sys}\sc.exe"; Parameters: "create ""PrintMonitor"" binPath= ""\""{app}\{#MyAppExeName}\"""" start= auto DisplayName= ""Nexrein Printer Monitor - Print Monitoring Agent"""; Flags: runhidden waituntilterminated; StatusMsg: "Registering Windows Service..."
+Filename: "{sys}\sc.exe"; Parameters: "config ""PrintMonitor"" binPath= ""\""{app}\{#MyAppExeName}\"""" start= auto DisplayName= ""Nexrein Printer Monitor - Print Monitoring Agent"""; Flags: runhidden waituntilterminated
 ; 2. Set Description
 Filename: "{sys}\sc.exe"; Parameters: "description ""PrintMonitor"" ""Monitors Windows print jobs and synchronizes print activity with the Nexrein Printer Monitor management system."""; Flags: runhidden waituntilterminated
 ; 3. Configure Recovery
@@ -103,9 +104,30 @@ begin
   AccountPage.Values[1] := ExpandConstant('{computername}');
 end;
 
+function ShouldSkipPage(PageID: Integer): Boolean;
+begin
+  Result := False;
+  if (AccountPage <> nil) and (PageID = AccountPage.ID) then
+  begin
+    if WizardSilent then
+    begin
+      if UserEmailInput = '' then UserEmailInput := 'admin@nexreindigital.co.ke';
+      if ShopNameInput = '' then ShopNameInput := ExpandConstant('{computername}');
+      Result := True;
+    end;
+  end;
+end;
+
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
   Result := True;
+  if WizardSilent then
+  begin
+    if UserEmailInput = '' then UserEmailInput := 'admin@nexreindigital.co.ke';
+    if ShopNameInput = '' then ShopNameInput := ExpandConstant('{computername}');
+    Exit;
+  end;
+
   if (AccountPage <> nil) and (CurPageID = AccountPage.ID) then
   begin
     if Trim(AccountPage.Values[0]) = '' then
@@ -162,9 +184,8 @@ begin
   begin
     // Stop running manager and service cleanly before replacing binaries
     Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM PrintMonitor.Manager.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM PrintMonitor.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
     Exec(ExpandConstant('{sys}\sc.exe'), 'stop "PrintMonitor"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-    Sleep(1000);
-    Exec(ExpandConstant('{sys}\sc.exe'), 'delete "PrintMonitor"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
     Sleep(1000);
 
     // Safeguard existing print database on version upgrades: create backup
@@ -172,7 +193,7 @@ begin
     DbBackupPath := ExpandConstant('{commonappdata}\PrintMonitor\printmonitor.db.upgrade_backup');
     if FileExists(DbPath) then
     begin
-      FileCopy(DbPath, DbBackupPath, False);
+      CopyFile(DbPath, DbBackupPath, False);
     end;
   end;
 

@@ -43,3 +43,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/printers/{id}/update', [DashboardController::class, 'updatePrinter'])->name('printers.update');
     Route::get('/export/csv', [DashboardController::class, 'exportCsv'])->name('export.csv');
 });
+
+// Direct agent endpoints fallback (handles cases where requests hit root path instead of /api)
+Route::prefix('devices')->group(function () {
+    Route::post('/register', [\App\Http\Controllers\Api\AgentApiController::class, 'register']);
+    Route::post('/heartbeat', [\App\Http\Controllers\Api\AgentApiController::class, 'heartbeat']);
+    Route::post('/acknowledge-password', [\App\Http\Controllers\Api\AgentApiController::class, 'acknowledgePassword']);
+});
+Route::post('/print-jobs/sync', [\App\Http\Controllers\Api\AgentApiController::class, 'syncJobs']);
+Route::post('/printers/sync', [\App\Http\Controllers\Api\AgentApiController::class, 'syncPrinters']);
+
