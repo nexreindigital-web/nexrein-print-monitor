@@ -59,6 +59,15 @@ public partial class MainWindow : Window
     {
         _isLoaded = true;
         _isUpdatingUi = false;
+
+        // Initialize Theme System (Follows Windows system theme by default)
+        ThemeManager.Initialize(this.Resources);
+        ThemeManager.ThemeChanged += OnThemeChanged;
+        if (CmbThemeSelector != null)
+        {
+            CmbThemeSelector.SelectedIndex = (int)ThemeManager.CurrentMode;
+        }
+
         LoadAllData();
         _refreshTimer.Start();
 
@@ -68,6 +77,44 @@ public partial class MainWindow : Window
             await Task.Delay(2000);
             await Dispatcher.InvokeAsync(() => RunUpdateCheckAsync(isManualClick: false));
         });
+    }
+
+    private void CmbThemeSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!_isLoaded || CmbThemeSelector == null) return;
+        var mode = (AppThemeMode)CmbThemeSelector.SelectedIndex;
+        ThemeManager.ApplyTheme(this.Resources, mode);
+        LoadDashboardPrints();
+        LoadJobs();
+    }
+
+    private void OnThemeChanged(bool isDark)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            if (_isLoaded)
+            {
+                LoadDashboardPrints();
+                LoadJobs();
+            }
+        });
+    }
+
+    private static (SolidColorBrush bg, SolidColorBrush fg) GetColorBadgeBrushes(bool isColor)
+    {
+        bool isDark = ThemeManager.IsDarkThemeActive;
+        if (isColor)
+        {
+            return isDark
+                ? (new SolidColorBrush(Color.FromRgb(88, 28, 135)), new SolidColorBrush(Color.FromRgb(233, 213, 255)))
+                : (new SolidColorBrush(Color.FromRgb(237, 233, 254)), new SolidColorBrush(Color.FromRgb(109, 40, 217)));
+        }
+        else
+        {
+            return isDark
+                ? (new SolidColorBrush(Color.FromRgb(30, 41, 59)), new SolidColorBrush(Color.FromRgb(148, 163, 184)))
+                : (new SolidColorBrush(Color.FromRgb(241, 245, 249)), new SolidColorBrush(Color.FromRgb(71, 85, 105)));
+        }
     }
 
     private void RefreshTimer_Tick(object? sender, EventArgs e)
@@ -504,8 +551,8 @@ public partial class MainWindow : Window
                     TotalPagesCalculated = (j.PagesPrinted > 0 ? j.PagesPrinted : (j.Pages * j.Copies)),
                     ColorMode = j.ColorMode,
                     ColorModeDisplay = isColor ? "🎨 Color" : "🔲 B&W / Gray",
-                    ColorBadgeBg = isColor ? new SolidColorBrush(Color.FromRgb(88, 28, 135)) : new SolidColorBrush(Color.FromRgb(30, 41, 59)),
-                    ColorBadgeFg = isColor ? new SolidColorBrush(Color.FromRgb(233, 213, 255)) : new SolidColorBrush(Color.FromRgb(148, 163, 184)),
+                    ColorBadgeBg = GetColorBadgeBrushes(isColor).bg,
+                    ColorBadgeFg = GetColorBadgeBrushes(isColor).fg,
                     Duplex = j.Duplex,
                     PaperSize = j.PaperSize,
                     Status = j.Status,
@@ -629,8 +676,8 @@ public partial class MainWindow : Window
                     TotalPagesCalculated = (j.PagesPrinted > 0 ? j.PagesPrinted : (j.Pages * j.Copies)),
                     ColorMode = j.ColorMode,
                     ColorModeDisplay = isColor ? "🎨 Color" : "🔲 B&W / Gray",
-                    ColorBadgeBg = isColor ? new SolidColorBrush(Color.FromRgb(88, 28, 135)) : new SolidColorBrush(Color.FromRgb(30, 41, 59)),
-                    ColorBadgeFg = isColor ? new SolidColorBrush(Color.FromRgb(233, 213, 255)) : new SolidColorBrush(Color.FromRgb(148, 163, 184)),
+                    ColorBadgeBg = GetColorBadgeBrushes(isColor).bg,
+                    ColorBadgeFg = GetColorBadgeBrushes(isColor).fg,
                     Duplex = j.Duplex,
                     PaperSize = j.PaperSize,
                     Status = j.Status,
@@ -855,7 +902,7 @@ public partial class MainWindow : Window
         var s = _settingsManager.Settings;
         if (TxtUserEmail != null) TxtUserEmail.Text = s.UserEmail ?? string.Empty;
         if (TxtShopName != null) TxtShopName.Text = s.ShopName ?? string.Empty;
-        TxtApiBaseUrl.Text = string.IsNullOrWhiteSpace(s.ApiBaseUrl) ? "https://printmonitor.nexreindigital.co.ke/api" : s.ApiBaseUrl;
+        TxtApiBaseUrl.Text = "https://printmonitor.nexreindigital.co.ke/api"; // Permanently locked & hardcoded
         TxtApiKey.Text = s.ApiKey;
         TxtSyncInterval.Text = s.SyncIntervalSeconds.ToString();
         TxtHeartbeatInterval.Text = s.HeartbeatIntervalSeconds.ToString();
@@ -880,7 +927,7 @@ public partial class MainWindow : Window
         {
             var userEmail = TxtUserEmail?.Text?.Trim() ?? string.Empty;
             var shopName = TxtShopName?.Text?.Trim() ?? string.Empty;
-            var url = TxtApiBaseUrl.Text?.Trim() ?? "https://printmonitor.nexreindigital.co.ke/api";
+            var url = "https://printmonitor.nexreindigital.co.ke/api"; // Permanently locked & hardcoded
             var key = TxtApiKey.Text?.Trim() ?? string.Empty;
 
             int.TryParse(TxtSyncInterval.Text, out var syncSec);

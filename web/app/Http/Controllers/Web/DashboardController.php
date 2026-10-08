@@ -13,15 +13,37 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DashboardController extends Controller
 {
+    /**
+     * Determine if currently authenticated user is platform super admin.
+     */
+    private function isSuperAdmin(): bool
+    {
+        $user = Auth::user();
+        if (!$user) return false;
+        return $user->email === 'admin@nexreindigital.co.ke' || (isset($user->is_admin) && $user->is_admin);
+    }
+
+    /**
+     * Get accessible device IDs for the current user (multi-tenant isolation).
+     */
+    private function getUserDeviceIds()
+    {
+        $user = Auth::user();
+        if ($this->isSuperAdmin()) {
+            return Device::pluck('device_id');
+        }
+        return Device::where('user_email', $user->email)->pluck('device_id');
+    }
+
     public function index(Request $request)
     {
         $user = Auth::user();
+        $isSuperAdmin = $this->isSuperAdmin();
+        $userDeviceIds = $this->getUserDeviceIds();
 
-        // 1. Base Query
+        // 1. Base Query with multi-tenant isolation
         $query = PrintJob::query();
-
-        // If user is tied to specific email or shops, filter by user email unless admin
-        if ($user && $user->email !== 'admin@nexreindigital.co.ke' && !str_starts_with($user->email, 'admin')) {
+        if (!$isSuperAdmin) {
             $query->where('user_email', $user->email);
         }
 
@@ -101,22 +123,30 @@ class DashboardController extends Controller
         $colorPages = (int) (clone $query)->where('color_mode', 'Color')->sum('total_pages_calculated');
         $monoPages = (int) (clone $query)->whereIn('color_mode', ['Monochrome', 'Grayscale', 'BlackAndWhite'])->sum('total_pages_calculated');
 
-        // Today specific lifetime KPI cards
-        $todayPages = (int) PrintJob::whereDate('submitted_at', $now->toDateString())->sum('total_pages_calculated');
-        $lifetimePages = (int) PrintJob::sum('total_pages_calculated');
+        // Scoped lifetime and today metrics for this user
+        $userJobsQuery = PrintJob::query();
+        if (!$isSuperAdmin) {
+            $userJobsQuery->where('user_email', $user->email);
+        }
+        $todayPages = (int) (clone $userJobsQuery)->whereDate('submitted_at', $now->toDateString())->sum('total_pages_calculated');
+        $lifetimePages = (int) (clone $userJobsQuery)->sum('total_pages_calculated');
 
-        // Connected devices stats
-        $activeDevicesCount = Device::where('last_heartbeat_at', '>=', now()->subMinutes(5))->count();
-        $totalDevicesCount = Device::count();
-        $totalPrintersCount = Printer::count();
+        // Connected devices stats scoped to this user
+        $devicesQuery = Device::query();
+        if (!$isSuperAdmin) {
+            $devicesQuery->where('user_email', $user->email);
+        }
+        $activeDevicesCount = (clone $devicesQuery)->where('last_heartbeat_at', '>=', now()->subMinutes(5))->count();
+        $totalDevicesCount = (clone $devicesQuery)->count();
+        $totalPrintersCount = Printer::whereIn('device_id', $userDeviceIds)->count();
 
         // 5. Paginated Print Jobs
         $jobs = $query->orderBy('submitted_at', 'desc')->paginate(25)->withQueryString();
 
-        // 6. Distinct options for filter controls
-        $shops = Device::whereNotNull('shop_name')->distinct()->pluck('shop_name')->filter()->values();
-        $computers = Device::whereNotNull('computer_name')->distinct()->pluck('computer_name')->filter()->values();
-        $printers = Printer::distinct()->pluck('name')->filter()->values();
+        // 6. Distinct options for filter controls (scoped)
+        $shops = (clone $devicesQuery)->whereNotNull('shop_name')->distinct()->pluck('shop_name')->filter()->values();
+        $computers = (clone $devicesQuery)->whereNotNull('computer_name')->distinct()->pluck('computer_name')->filter()->values();
+        $printers = Printer::whereIn('device_id', $userDeviceIds)->distinct()->pluck('name')->filter()->values();
 
         return view('dashboard.index', compact(
             'jobs',
@@ -141,10 +171,18 @@ class DashboardController extends Controller
 
     public function devices()
     {
-        $devices = Device::withCount(['printJobs', 'printers'])
+        $user = Auth::user();
+        $isSuperAdmin = $this->isSuperAdmin();
+
+        $query = Device::withCount(['printJobs', 'printers'])
             ->withSum('printJobs', 'total_pages_calculated')
-            ->orderBy('last_heartbeat_at', 'desc')
-            ->get();
+            ->orderBy('last_heartbeat_at', 'desc');
+
+        if (!$isSuperAdmin) {
+            $query->where('user_email', $user->email);
+        }
+
+        $devices = $query->get();
 
         return view('dashboard.devices', compact('devices'));
     }
@@ -157,7 +195,14 @@ class DashboardController extends Controller
             'new_password' => 'required|string|min:4',
         ]);
 
+        $user = Auth::user();
+        $isSuperAdmin = $this->isSuperAdmin();
+
         $query = Device::query();
+        if (!$isSuperAdmin) {
+            $query->where('user_email', $user->email);
+        }
+
         if ($request->filled('device_id') && $request->device_id !== 'all') {
             $query->where('device_id', $request->device_id);
         } elseif ($request->filled('shop_name') && $request->shop_name !== 'all') {
@@ -165,6 +210,10 @@ class DashboardController extends Controller
         }
 
         $count = $query->count();
+        if ($count === 0) {
+            return back()->with('error', 'No matching computers found for your account.');
+        }
+
         $query->update([
             'software_password' => $request->new_password,
             'pending_password_update' => $request->new_password,
@@ -175,16 +224,56 @@ class DashboardController extends Controller
 
     public function printers()
     {
+        $user = Auth::user();
+        $userDeviceIds = $this->getUserDeviceIds();
+
         $printers = Printer::with('device')
+            ->whereIn('device_id', $userDeviceIds)
             ->orderBy('last_seen_at', 'desc')
             ->get();
 
         return view('dashboard.printers', compact('printers'));
     }
 
+    public function updatePrinter(Request $request, $id)
+    {
+        $user = Auth::user();
+        $userDeviceIds = $this->getUserDeviceIds();
+
+        $printer = Printer::where('id', $id)
+            ->whereIn('device_id', $userDeviceIds)
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'alias_name'          => 'nullable|string|max:150',
+            'location'            => 'nullable|string|max:150',
+            'cost_per_mono_page'  => 'nullable|numeric|min:0',
+            'cost_per_color_page' => 'nullable|numeric|min:0',
+            'is_active'           => 'nullable|boolean',
+            'notes'               => 'nullable|string|max:500',
+        ]);
+
+        $printer->alias_name = $validated['alias_name'] ?? null;
+        $printer->location = $validated['location'] ?? null;
+        $printer->cost_per_mono_page = $validated['cost_per_mono_page'] ?? 0.00;
+        $printer->cost_per_color_page = $validated['cost_per_color_page'] ?? 0.00;
+        $printer->is_active = $request->has('is_active');
+        $printer->notes = $validated['notes'] ?? null;
+        $printer->save();
+
+        return back()->with('success', "Printer '{$printer->name}' settings updated successfully.");
+    }
+
     public function exportCsv(Request $request): StreamedResponse
     {
+        $user = Auth::user();
+        $isSuperAdmin = $this->isSuperAdmin();
+
         $query = PrintJob::query()->orderBy('submitted_at', 'desc');
+
+        if (!$isSuperAdmin) {
+            $query->where('user_email', $user->email);
+        }
 
         if ($request->filled('shop_name')) {
             $query->where('shop_name', $request->shop_name);
@@ -200,44 +289,51 @@ class DashboardController extends Controller
         }
 
         $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="print_jobs_export_' . date('Y-m-d_His') . '.csv"',
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="PrintJobs_' . now()->format('Ymd_His') . '.csv"',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
         ];
 
-        return new StreamedResponse(function () use ($query) {
+        return response()->stream(function () use ($query) {
             $handle = fopen('php://output', 'w');
             fputcsv($handle, [
                 'Job UID',
-                'Shop / Branch',
-                'Computer Name',
+                'Date/Time (UTC)',
                 'User Account',
+                'Shop Name',
+                'Workstation',
                 'Printer',
                 'Document Name',
-                'Pages',
+                'User',
+                'Pages Count',
                 'Copies',
                 'Total Pages',
                 'Color Mode',
                 'Duplex',
-                'Status',
-                'Submitted At',
+                'Paper Size',
+                'Status'
             ]);
 
             $query->chunk(500, function ($jobs) use ($handle) {
                 foreach ($jobs as $j) {
                     fputcsv($handle, [
                         $j->job_uid,
+                        $j->submitted_at ? $j->submitted_at->toIso8601String() : '',
+                        $j->user_email,
                         $j->shop_name,
                         $j->computer_name,
-                        $j->username,
                         $j->printer_name,
                         $j->document_name,
+                        $j->username,
                         $j->pages,
                         $j->copies,
                         $j->total_pages_calculated,
                         $j->color_mode,
                         $j->duplex,
-                        $j->status,
-                        $j->submitted_at ? $j->submitted_at->toDateTimeString() : '',
+                        $j->paper_size,
+                        $j->status
                     ]);
                 }
             });

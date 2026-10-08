@@ -40,5 +40,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/devices', [DashboardController::class, 'devices'])->name('devices');
     Route::post('/devices/update-software-password', [DashboardController::class, 'updateSoftwarePassword'])->name('devices.update_software_password');
     Route::get('/printers', [DashboardController::class, 'printers'])->name('printers');
+    Route::post('/printers/{id}/update', [DashboardController::class, 'updatePrinter'])->name('printers.update');
     Route::get('/export/csv', [DashboardController::class, 'exportCsv'])->name('export.csv');
 });
