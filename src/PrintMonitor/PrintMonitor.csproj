@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-PrintMonitor-4c822c33-f410-438b-985b-c907659d2167</UserSecretsId>
+    <Product>Nexrein Print Monitor</Product>
+    <Company>Nexrein</Company>
+    <Description>Nexrein Print Monitor - Windows Print Monitoring Agent</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.12" />
+  </ItemGroup>
+
+  <!-- Automatically build the Inno Setup installer after publishing Release win-x64 -->
+  <Target Name="GenerateInstallerAfterPublish" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release' and '$(RuntimeIdentifier)' == 'win-x64' and '$(SkipInstallerBuild)' != 'true'">
+    <Message Importance="high" Text="================================================================" />
+    <Message Importance="high" Text="Building self-contained installer for win-x64 Release..." />
+    <Message Importance="high" Text="================================================================" />
+    <Exec Command="powershell -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\..\..\scripts\build-installer.ps1&quot; -Configuration $(Configuration) -SkipPublish" ContinueOnError="false" />
+  </Target>
+</Project>

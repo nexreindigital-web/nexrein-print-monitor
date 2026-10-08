@@ -1,0 +1,11 @@
+{
+  "product": "Nexrein Print Monitor",
+  "version": "1.0.0",
+  "releaseDate": "2026-10-08",
+  "targetPlatform": "win-x64",
+  "installer": "release/PrintMonitor-Setup.exe",
+  "components": {
+    "service": "PrintMonitor.exe",
+    "manager": "PrintMonitor.Manager.exe"
+  }
+}

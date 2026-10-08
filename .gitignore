@@ -1,0 +1,44 @@
+## .gitignore for Nexrein Print Monitor
+
+# Visual Studio & JetBrains temporary files
+.vs/
+.idea/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+
+# Build Outputs (bin/obj across projects)
+**/[Bb]in/
+**/[Oo]bj/
+
+# Test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# User logs & local databases
+*.log
+install_test.log
+*.db
+*.db-shm
+*.db-wal
+
+# Windows system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Package directories
+*.nupkg
+packages/
+
+# ==========================================================
+# CRITICAL: EXPLICITLY INCLUDE INSTALLER AS REQUESTED BY USER
+# "and include installers"
+# ==========================================================
+!release/
+!release/PrintMonitor-Setup.exe
+!dist/
+!dist/PrintMonitor-Setup.exe
