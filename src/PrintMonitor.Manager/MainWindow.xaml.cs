@@ -28,6 +28,7 @@ public partial class MainWindow : Window
     private bool _isUpdatingUi = true;
     private bool _isLoaded = false;
     private bool _allowExit = false;
+    private TrayIconManager? _trayManager;
 
     public MainWindow()
     {
@@ -60,6 +61,17 @@ public partial class MainWindow : Window
         _isLoaded = true;
         _isUpdatingUi = false;
 
+        // Initialize Native Windows Tray Icon for background operation
+        try
+        {
+            _trayManager = new TrayIconManager(this);
+            _trayManager.OpenRequested += () => Dispatcher.Invoke(RestoreFromTray);
+            _trayManager.WebPortalRequested += () => Dispatcher.Invoke(OpenCloudWebPortal);
+            _trayManager.CheckUpdatesRequested += () => Dispatcher.Invoke(async () => await RunUpdateCheckAsync(isManualClick: true));
+            _trayManager.ExitRequested += () => Dispatcher.Invoke(RequestApplicationExit);
+        }
+        catch { }
+
         // Initialize Theme System (Follows Windows system theme by default)
         ThemeManager.Initialize(this.Resources);
         ThemeManager.ThemeChanged += OnThemeChanged;
@@ -70,6 +82,14 @@ public partial class MainWindow : Window
 
         LoadAllData();
         _refreshTimer.Start();
+
+        // If launched with --background or --minimized, start directly in the system tray
+        var cmdArgs = Environment.GetCommandLineArgs();
+        if (cmdArgs.Any(a => a.Equals("--background", StringComparison.OrdinalIgnoreCase) || a.Equals("--minimized", StringComparison.OrdinalIgnoreCase)))
+        {
+            Hide();
+            TxtStatusBar.Text = "Running in background (System Tray). Double-click tray icon to open.";
+        }
 
         // Check for updates in the background (non-blocking)
         _ = Task.Run(async () =>
@@ -160,29 +180,79 @@ public partial class MainWindow : Window
     private void Window_Closing(object? sender, CancelEventArgs e)
     {
         if (_allowExit)
+        {
+            _trayManager?.Dispose();
             return;
+        }
 
-        // Require super admin to close the app
-        var authed = RequireSuperAdmin("Super Admin password is required to close and terminate the Control Panel application.");
+        // When closed, run in the background. It cannot be terminated fully without Super Admin password.
+        e.Cancel = true;
+        Hide();
+
+        _trayManager?.ShowBalloon(
+            "Nexrein Printer Monitor",
+            "Application is running in the background to ensure continuous print auditing.\nFully terminating requires Super Admin password.",
+            TrayNotificationType.Info);
+
+        TxtStatusBar.Text = "Running in background (System Tray). Double-click tray icon to open.";
+    }
+
+    public void RequestApplicationExit()
+    {
+        // Bring window to foreground to prompt
+        Show();
+        if (WindowState == WindowState.Minimized)
+        {
+            WindowState = WindowState.Normal;
+        }
+        Activate();
+
+        var authed = RequireSuperAdmin("Super Admin password is required to exit and terminate Nexrein Printer Monitor.");
         if (authed)
         {
             _allowExit = true;
+            _trayManager?.Dispose();
+            Close();
+            System.Windows.Application.Current.Shutdown();
         }
         else
         {
-            e.Cancel = true;
-            TxtStatusBar.Text = "Close cancelled: Super Admin authentication required.";
+            TxtStatusBar.Text = "Exit prevented: Super Admin authentication required.";
+            _trayManager?.ShowBalloon(
+                "Access Denied",
+                "Super Admin authentication is required to terminate Nexrein Printer Monitor.",
+                TrayNotificationType.Warning);
         }
     }
 
     private void BtnExitApp_Click(object sender, RoutedEventArgs e)
     {
-        var authed = RequireSuperAdmin("Super Admin password is required to exit the Control Panel.");
-        if (authed)
+        RequestApplicationExit();
+    }
+
+    private void RestoreFromTray()
+    {
+        Show();
+        if (WindowState == WindowState.Minimized)
         {
-            _allowExit = true;
-            Close();
+            WindowState = WindowState.Normal;
         }
+        Activate();
+        Focus();
+    }
+
+    private void OpenCloudWebPortal()
+    {
+        var url = _settingsManager?.Settings?.ApiBaseUrl;
+        if (string.IsNullOrWhiteSpace(url) || url.Contains("your-domain.com"))
+        {
+            url = "https://printmonitor.nexreindigital.co.ke/dashboard";
+        }
+        else
+        {
+            url = url.Replace("/api", "") + "/dashboard";
+        }
+        VersionController.OpenUrl(url);
     }
 
     private void BtnUpdatePassword_Click(object sender, RoutedEventArgs e)
@@ -1305,14 +1375,93 @@ public partial class MainWindow : Window
         await RunUpdateCheckAsync(isManualClick: true);
     }
 
-    private void BtnDownloadUpdate_Click(object sender, RoutedEventArgs e)
+    private async void BtnDownloadUpdate_Click(object sender, RoutedEventArgs e)
     {
-        var targetUrl = _latestCheckResult?.DownloadUrl;
-        if (string.IsNullOrWhiteSpace(targetUrl))
+        var targetUrl = _latestCheckResult?.DownloadUrl ?? VersionController.DirectInstallerUrl;
+        var version = _latestCheckResult?.LatestVersion ?? "latest";
+
+        var confirm = MessageBox.Show(
+            $"You are about to install Nexrein Printer Monitor v{version}.\n\n" +
+            "🛡️ DATA PRESERVATION GUARANTEE:\n" +
+            "• All print job records, pages, and logs remain 100% intact.\n" +
+            "• Your Device ID, User Email, Shop Name, and Passwords will NOT be modified.\n" +
+            "• An automated pre-update safety backup will be created.\n\n" +
+            "Would you like to download and install this update now?",
+            "Confirm Update Installation",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+
+        if (confirm != MessageBoxResult.Yes)
         {
-            targetUrl = "https://github.com/nexreindigital-web/nexrein-print-monitor/releases/latest";
+            return;
         }
-        VersionController.OpenUrl(targetUrl);
+
+        if (BtnDownloadUpdate != null) BtnDownloadUpdate.IsEnabled = false;
+        if (BtnCheckUpdates != null) BtnCheckUpdates.IsEnabled = false;
+        if (PbUpdateProgress != null)
+        {
+            PbUpdateProgress.Visibility = Visibility.Visible;
+            PbUpdateProgress.Value = 0;
+        }
+
+        var progress = new Progress<double>(pct =>
+        {
+            if (PbUpdateProgress != null) PbUpdateProgress.Value = pct;
+            if (TxtUpdateStatusDetails != null)
+                TxtUpdateStatusDetails.Text = $"Downloading update package: {pct:F0}%...";
+        });
+
+        var success = await Task.Run(async () =>
+        {
+            return await VersionController.DownloadAndLaunchUpdateAsync(
+                targetUrl,
+                progress,
+                status => Dispatcher.Invoke(() =>
+                {
+                    if (TxtUpdateStatusDetails != null)
+                        TxtUpdateStatusDetails.Text = status;
+                }));
+        });
+
+        if (success)
+        {
+            if (TxtUpdateStatusDetails != null)
+            {
+                TxtUpdateStatusDetails.Text = "Update installer started! Control Panel will now close so setup can update files cleanly. Existing data is preserved.";
+                TxtUpdateStatusDetails.Foreground = new SolidColorBrush(Color.FromRgb(52, 211, 153));
+            }
+
+            MessageBox.Show(
+                "Update installer launched successfully!\n\n" +
+                "The Control Panel will now close to allow the installer to update application files cleanly.\n" +
+                "Your print records and settings have been safely preserved.",
+                "Updating Nexrein Printer Monitor",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+
+            _allowExit = true;
+            _trayManager?.Dispose();
+            Close();
+            System.Windows.Application.Current.Shutdown();
+        }
+        else
+        {
+            if (BtnDownloadUpdate != null) BtnDownloadUpdate.IsEnabled = true;
+            if (BtnCheckUpdates != null) BtnCheckUpdates.IsEnabled = true;
+            if (PbUpdateProgress != null) PbUpdateProgress.Visibility = Visibility.Collapsed;
+
+            var openWeb = MessageBox.Show(
+                "Automatic package download could not be completed directly.\n\n" +
+                "Would you like to open the official download page instead to download the installer manually?",
+                "Update Download Notice",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (openWeb == MessageBoxResult.Yes)
+            {
+                VersionController.OpenUrl(targetUrl);
+            }
+        }
     }
 
     private void BtnUpdateBadge_Click(object sender, RoutedEventArgs e)
@@ -1330,7 +1479,7 @@ public partial class MainWindow : Window
         if (BtnCheckUpdates != null) BtnCheckUpdates.IsEnabled = false;
         if (TxtUpdateStatusDetails != null && isManualClick)
         {
-            TxtUpdateStatusDetails.Text = "Querying update server for latest version...";
+            TxtUpdateStatusDetails.Text = "Querying update server and GitHub channels for latest version...";
             TxtUpdateStatusDetails.Foreground = new SolidColorBrush(Color.FromRgb(56, 189, 248));
         }
 
@@ -1372,10 +1521,17 @@ public partial class MainWindow : Window
                     TxtVersionPill.Text = $"Update v{result.LatestVersion} Available";
                 }
 
+                _trayManager?.ShowBalloon(
+                    "Nexrein Printer Monitor Update Available",
+                    $"Version v{result.LatestVersion} is available. All your print records and settings will remain intact.",
+                    TrayNotificationType.Info);
+
                 if (isManualClick)
                 {
                     var prompt = MessageBox.Show(
-                        $"A new update (v{result.LatestVersion}) for Nexrein Printer Monitor is available!\n\nWould you like to open the download page now?",
+                        $"A new update (v{result.LatestVersion}) for Nexrein Printer Monitor is available!\n\n" +
+                        "All local print records and settings will be preserved.\n\n" +
+                        "Would you like to install the update now?",
                         "Update Available",
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Information);

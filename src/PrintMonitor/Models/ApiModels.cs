@@ -87,6 +87,15 @@ public class HeartbeatRequest
 
     [JsonPropertyName("pending_sync_count")]
     public int PendingSyncCount { get; set; }
+
+    [JsonPropertyName("ip_address")]
+    public string? IpAddress { get; set; }
+
+    [JsonPropertyName("mac_address")]
+    public string? MacAddress { get; set; }
+
+    [JsonPropertyName("os_version")]
+    public string? OsVersion { get; set; }
 }
 
 public class HeartbeatResponse

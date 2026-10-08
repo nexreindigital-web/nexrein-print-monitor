@@ -168,10 +168,24 @@ class AgentApiController extends Controller
             if (!empty($shopName) && $shopName !== 'Main Shop') {
                 $device->shop_name = $shopName;
             }
+            // Refresh live network details from every heartbeat
+            if ($request->has('ip_address') && !empty($request->input('ip_address'))) {
+                $device->ip_address = $request->input('ip_address');
+            }
+            if ($request->has('mac_address') && !empty($request->input('mac_address'))) {
+                $device->mac_address = $request->input('mac_address');
+            }
+            if ($request->has('os_version') && !empty($request->input('os_version'))) {
+                $device->os_version = $request->input('os_version');
+            }
+            if ($request->has('application_version') && !empty($request->input('application_version'))) {
+                $device->app_version = $request->input('application_version');
+            }
             $device->status = $request->input('status', 'Online');
             $device->last_heartbeat_at = now();
             $device->save();
         }
+
 
         $response = [
             'status'      => 'ok',

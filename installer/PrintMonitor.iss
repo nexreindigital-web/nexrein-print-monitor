@@ -76,6 +76,8 @@ Filename: "{sys}\sc.exe"; Parameters: "start ""PrintMonitor"""; Flags: runhidden
 Filename: "{app}\{#MyManagerExeName}"; Description: "Launch Nexrein Printer Monitor Control Panel"; Flags: postinstall nowait skipifsilent
 ; 6. Open Web Portal for First-Time Setup
 Filename: "https://printmonitor.nexreindigital.co.ke/login?email={code:GetUserEmailParam}"; Description: "Open Nexrein Printer Monitor Web Portal for First-Time Setup"; Flags: postinstall shellexec nowait skipifsilent
+; 7. Silent update resume: when updating silently, automatically resume Manager in background
+Filename: "{app}\{#MyManagerExeName}"; Parameters: "--background"; Flags: runhidden nowait; Check: WizardSilent
 
 [UninstallRun]
 ; Stop and delete service before removing files
@@ -111,6 +113,13 @@ begin
   Result := False;
   if (AccountPage <> nil) and (PageID = AccountPage.ID) then
   begin
+    // If upgrading an existing installation, skip AccountPage to keep existing settings untouched
+    if FileExists(ExpandConstant('{commonappdata}\PrintMonitor\config.json')) then
+    begin
+      Result := True;
+      Exit;
+    end;
+
     if WizardSilent then
     begin
       if UserEmailInput = '' then UserEmailInput := 'admin@nexreindigital.co.ke';

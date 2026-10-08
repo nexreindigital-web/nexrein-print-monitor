@@ -27,9 +27,9 @@ public partial class PasswordPromptDialog : Window
         ValidateAndSubmit();
     }
 
-    private void PbPassword_KeyDown(object sender, KeyEventArgs e)
+    private void PbPassword_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
-        if (e.Key == Key.Enter)
+        if (e.Key == System.Windows.Input.Key.Enter)
         {
             ValidateAndSubmit();
         }

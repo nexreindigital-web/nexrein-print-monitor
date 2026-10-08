@@ -412,7 +412,7 @@
                         <Border Width="1" Height="20" Background="#334155" Margin="4,0,8,0" />
                         <Button x:Name="BtnWinMinimize" Content="🗕" Style="{StaticResource CaptionBtn}" ToolTip="Minimize" Click="BtnWinMinimize_Click" />
                         <Button x:Name="BtnWinMaximize" Content="🗖" Style="{StaticResource CaptionBtn}" ToolTip="Maximize / Restore" Click="BtnWinMaximize_Click" />
-                        <Button x:Name="BtnWinClose" Content="✕" Style="{StaticResource CaptionCloseBtn}" ToolTip="Close (Requires Password)" Click="BtnWinClose_Click" />
+                        <Button x:Name="BtnWinClose" Content="✕" Style="{StaticResource CaptionCloseBtn}" ToolTip="Close to Background / System Tray" Click="BtnWinClose_Click" />
                     </StackPanel>
                 </Grid>
 
@@ -989,7 +989,10 @@
                                     </StackPanel>
                                 </Grid>
 
-                                <Button Content="🔑 Update Super Admin Password" Style="{StaticResource PrimaryBtn}" HorizontalAlignment="Left" Click="BtnUpdatePassword_Click" />
+                                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                    <Button Content="🔑 Update Super Admin Password" Style="{StaticResource PrimaryBtn}" Margin="0,0,10,0" Click="BtnUpdatePassword_Click" />
+                                    <Button x:Name="BtnExitApp" Content="🛑 Terminate Application" Style="{StaticResource DangerStopBtn}" Click="BtnExitApp_Click" ToolTip="Terminate application fully (Requires Super Admin Password)" />
+                                </StackPanel>
                             </StackPanel>
                         </Border>
 
@@ -1033,12 +1036,21 @@
                                     </Border>
                                 </Grid>
 
-                                <TextBlock x:Name="TxtUpdateStatusDetails" Text="Click 'Check for Updates' to verify against release servers and GitHub channels." FontSize="12" Foreground="{DynamicResource TextSecondary}" Margin="0,0,0,14" />
+                                <ProgressBar x:Name="PbUpdateProgress" Height="8" Minimum="0" Maximum="100" Value="0" Margin="0,0,0,12" Visibility="Collapsed" Foreground="#38BDF8" Background="{DynamicResource BgInput}" BorderThickness="0" />
 
-                                <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="TxtUpdateStatusDetails" Text="Click 'Check for Updates' to verify against release servers and GitHub channels." FontSize="12" Foreground="{DynamicResource TextSecondary}" TextWrapping="Wrap" Margin="0,0,0,14" />
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                                     <Button x:Name="BtnCheckUpdates" Content="🔍 Check for Updates Now" Style="{StaticResource PrimaryBtn}" Margin="0,0,10,0" Click="BtnCheckUpdates_Click" />
-                                    <Button x:Name="BtnDownloadUpdate" Content="⬇️ Download / Install Update" Style="{StaticResource SuccessBtn}" Visibility="Collapsed" Click="BtnDownloadUpdate_Click" />
+                                    <Button x:Name="BtnDownloadUpdate" Content="⚡ Install Update Now (Preserves All Data)" Style="{StaticResource SuccessBtn}" Visibility="Collapsed" Click="BtnDownloadUpdate_Click" />
                                 </StackPanel>
+
+                                <Border Background="{DynamicResource BgInput}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="6" Padding="10,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="🛡️ " FontSize="13" VerticalAlignment="Center" />
+                                        <TextBlock Text="Data Preservation Guarantee: Updating replaces software binaries only. Your print records, counters, user accounts, and credentials will not be modified or reset." FontSize="12" Foreground="{DynamicResource TextSecondary}" TextWrapping="Wrap" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
                             </StackPanel>
                         </Border>
                     </StackPanel>

@@ -14,7 +14,7 @@ namespace PrintMonitor;
 
 public class Program
 {
-    public const string AppVersion = "1.0.0";
+    public const string AppVersion = "2.0.0";
     public const string ServiceName = "PrintMonitor";
 
     public static async Task<int> Main(string[] args)

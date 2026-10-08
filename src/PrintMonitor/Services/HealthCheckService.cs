@@ -94,6 +94,7 @@ public class HealthCheckService : IHealthCheckService
             var deviceId = _settingsManager.Settings.DeviceId;
             var printerCount = _dbContext.GetPrinterCount();
             var pendingCount = _dbContext.GetPendingSyncCount();
+            var (ip, mac) = PrintMonitor.Utilities.NetworkHelper.GetPrimaryNetworkDetails();
 
             var request = new HeartbeatRequest
             {
@@ -105,7 +106,10 @@ public class HealthCheckService : IHealthCheckService
                 Status = "online",
                 LastSeen = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture),
                 PrinterCount = printerCount,
-                PendingSyncCount = pendingCount
+                PendingSyncCount = pendingCount,
+                IpAddress = ip,
+                MacAddress = mac,
+                OsVersion = Environment.OSVersion.VersionString
             };
 
             var (success, response, error) = await _apiClient.SendHeartbeatAsync(request, cancellationToken);

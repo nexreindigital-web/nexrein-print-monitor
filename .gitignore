@@ -42,3 +42,5 @@ packages/
 !release/PrintMonitor-Setup.exe
 !dist/
 !dist/PrintMonitor-Setup.exe
+scratch/
+
