@@ -22,19 +22,30 @@ namespace PrintMonitor.Manager;
 public partial class MainWindow : Window
 {
     private const string ServiceName = "PrintMonitor";
-    private readonly SettingsManager _settingsManager;
-    private readonly PrintMonitorDbContext _dbContext;
+    private readonly SettingsManager _settingsManager = null!;
+    private readonly PrintMonitorDbContext _dbContext = null!;
     private readonly DispatcherTimer _refreshTimer;
-    private bool _isUpdatingUi = false;
+    private bool _isUpdatingUi = true;
+    private bool _isLoaded = false;
     private bool _allowExit = false;
 
     public MainWindow()
     {
-        InitializeComponent();
+        _isUpdatingUi = true;
+        _isLoaded = false;
 
-        _settingsManager = new SettingsManager();
-        var connStr = $"Data Source={_settingsManager.Settings.DatabasePath}";
-        _dbContext = new PrintMonitorDbContext(connStr);
+        try
+        {
+            _settingsManager = new SettingsManager();
+            var connStr = $"Data Source={_settingsManager.Settings.DatabasePath}";
+            _dbContext = new PrintMonitorDbContext(connStr);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Settings/Database initialization notice: {ex.Message}", "Nexrein Print Monitor", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        InitializeComponent();
 
         // Auto refresh every 3 seconds for live tracking
         _refreshTimer = new DispatcherTimer
@@ -46,6 +57,8 @@ public partial class MainWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
+        _isLoaded = true;
+        _isUpdatingUi = false;
         LoadAllData();
         _refreshTimer.Start();
     }
@@ -412,6 +425,9 @@ public partial class MainWindow : Window
 
     private void LoadJobs()
     {
+        if (!_isLoaded || _isUpdatingUi || _dbContext == null || DgJobs == null || TxtSearchJob == null || CmbPrinterFilter == null || CmbSyncFilter == null)
+            return;
+
         try
         {
             var search = TxtSearchJob.Text;
@@ -451,27 +467,32 @@ public partial class MainWindow : Window
             }).ToList();
 
             DgJobs.ItemsSource = items;
-            TxtJobTableSummary.Text = $"Showing {items.Count} job(s) | Total pages in view: {items.Sum(x => x.TotalPagesCalculated):N0}";
+            if (TxtJobTableSummary != null)
+                TxtJobTableSummary.Text = $"Showing {items.Count} job(s) | Total pages in view: {items.Sum(x => x.TotalPagesCalculated):N0}";
         }
         catch (Exception ex)
         {
-            TxtStatusBar.Text = $"Error loading jobs: {ex.Message}";
+            if (TxtStatusBar != null)
+                TxtStatusBar.Text = $"Error loading jobs: {ex.Message}";
         }
     }
 
     private void TxtSearchJob_TextChanged(object sender, TextChangedEventArgs e)
     {
+        if (!_isLoaded || _isUpdatingUi) return;
         LoadJobs();
     }
 
     private void CmbPrinterFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (!_isUpdatingUi) LoadJobs();
+        if (!_isLoaded || _isUpdatingUi) return;
+        LoadJobs();
     }
 
     private void CmbSyncFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (!_isUpdatingUi) LoadJobs();
+        if (!_isLoaded || _isUpdatingUi) return;
+        LoadJobs();
     }
 
     private void BtnRefreshJobs_Click(object sender, RoutedEventArgs e)
@@ -564,6 +585,7 @@ public partial class MainWindow : Window
 
     private void LoadPrinters()
     {
+        if (!_isLoaded || _isUpdatingUi || _dbContext == null || DgPrinters == null) return;
         try
         {
             List<PrinterInfo> printers;
@@ -585,7 +607,8 @@ public partial class MainWindow : Window
                 printers = _dbContext.GetAllPrinters();
             }
 
-            TxtPrinterCountHeader.Text = $"{printers.Count} printer(s) detected";
+            if (TxtPrinterCountHeader != null)
+                TxtPrinterCountHeader.Text = $"{printers.Count} printer(s) detected";
 
             var items = printers.Select(p => new PrinterDisplayItem
             {
@@ -601,18 +624,22 @@ public partial class MainWindow : Window
 
             DgPrinters.ItemsSource = items;
 
-            _isUpdatingUi = true;
-            CmbPrinterFilter.Items.Clear();
-            CmbPrinterFilter.Items.Add(new ComboBoxItem { Content = "All Printers", IsSelected = true });
-            foreach (var p in printers)
+            if (CmbPrinterFilter != null)
             {
-                CmbPrinterFilter.Items.Add(new ComboBoxItem { Content = p.Name });
+                _isUpdatingUi = true;
+                CmbPrinterFilter.Items.Clear();
+                CmbPrinterFilter.Items.Add(new ComboBoxItem { Content = "All Printers", IsSelected = true });
+                foreach (var p in printers)
+                {
+                    CmbPrinterFilter.Items.Add(new ComboBoxItem { Content = p.Name });
+                }
+                _isUpdatingUi = false;
             }
-            _isUpdatingUi = false;
         }
         catch (Exception ex)
         {
-            TxtStatusBar.Text = $"Error scanning printers: {ex.Message}";
+            if (TxtStatusBar != null)
+                TxtStatusBar.Text = $"Error scanning printers: {ex.Message}";
         }
     }
 
@@ -650,6 +677,7 @@ public partial class MainWindow : Window
 
     private void LoadApiSettings()
     {
+        if (!_isLoaded || _settingsManager == null || TxtApiBaseUrl == null) return;
         var s = _settingsManager.Settings;
         TxtApiBaseUrl.Text = s.ApiBaseUrl;
         TxtApiKey.Text = s.ApiKey;
@@ -825,6 +853,7 @@ public partial class MainWindow : Window
 
     private void MainTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        if (!_isLoaded || _isUpdatingUi) return;
         if (e.Source is TabControl)
         {
             if (MainTabs.SelectedIndex == 1) LoadJobs();

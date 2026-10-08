@@ -49,12 +49,17 @@ Source: "{#SourcePublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recurses
 Source: "assets\app.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "assets\app.png"; DestDir: "{app}"; Flags: ignoreversion
 
+[InstallDelete]
+Type: files; Name: "{commondesktop}\PrintMonitor Manager.lnk"
+Type: files; Name: "{userdesktop}\PrintMonitor Manager.lnk"
+Type: files; Name: "{userdesktop}\Nexrein Print Monitor.lnk"
+
 [Icons]
 Name: "{group}\Nexrein Print Monitor Control Panel"; Filename: "{app}\{#MyManagerExeName}"; IconFilename: "{app}\app.ico"
 Name: "{group}\Nexrein Print Monitor Status (CLI)"; Filename: "{app}\{#MyAppExeName}"; Parameters: "--status"
 Name: "{group}\Nexrein Print Monitor Printers (CLI)"; Filename: "{app}\{#MyAppExeName}"; Parameters: "--printers"
 Name: "{group}\Uninstall Nexrein Print Monitor"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\Nexrein Print Monitor"; Filename: "{app}\{#MyManagerExeName}"; Tasks: desktopicon; IconFilename: "{app}\app.ico"
+Name: "{commondesktop}\Nexrein Print Monitor"; Filename: "{app}\{#MyManagerExeName}"; Tasks: desktopicon; IconFilename: "{app}\app.ico"
 
 [Run]
 ; 1. Register Service with sc.exe
